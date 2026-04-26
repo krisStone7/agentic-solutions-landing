@@ -164,8 +164,8 @@ function App() {
               Solutions can help define the scope, stand up the environment, and
               make it usable for the people who will run it.
             </p>
-            <a className="button button-primary" href="mailto:hello@agenticsolutions.la">
-              hello@agenticsolutions.la
+            <a className="button button-primary" href="mailto:krisbstone@gmail.com">
+              krisbstone@gmail.com
             </a>
           </div>
         </section>
