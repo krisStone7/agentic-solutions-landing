@@ -412,3 +412,168 @@ h3 {
     width: 100%;
   }
 }
+
+.section-heading.wide h2 {
+  max-width: 18ch;
+}
+
+.section-intro {
+  max-width: 68ch;
+  margin: 0;
+  color: #b8c2cb;
+  font-size: 1.03rem;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.role-card,
+.timeline-item,
+.comparison-card,
+.comparison-column {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 14, 20, 0.72);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.role-card {
+  min-height: 23rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.4rem;
+  border-radius: 1.35rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.role-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 18% 0%, rgba(122, 215, 198, 0.16), transparent 34%);
+  pointer-events: none;
+}
+
+.role-card > * {
+  position: relative;
+}
+
+.role-card p,
+.timeline-item p,
+.comparison-column li {
+  color: #b8c2cb;
+}
+
+.role-card ul,
+.comparison-column ul {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.role-card li,
+.comparison-column li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.role-card li::before,
+.comparison-column li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: #7ad7c6;
+}
+
+.day-section {
+  padding-top: 2rem;
+}
+
+.timeline {
+  display: grid;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  padding: 1.3rem 1.4rem;
+  border-radius: 1.35rem;
+}
+
+.timeline-time {
+  color: #7ad7c6;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+.comparison-card {
+  padding: 1.5rem;
+  border-radius: 1.6rem;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.comparison-column {
+  padding: 1.4rem;
+  border-radius: 1.25rem;
+}
+
+.accent-panel {
+  background:
+    linear-gradient(135deg, rgba(122, 215, 198, 0.14), rgba(87, 163, 255, 0.1)),
+    rgba(10, 14, 20, 0.72);
+  border-color: rgba(122, 215, 198, 0.22);
+}
+
+.muted-panel {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+@media (max-width: 980px) {
+  .role-grid,
+  .comparison-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .role-card {
+    min-height: 19rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .role-grid,
+  .comparison-grid,
+  .timeline-item {
+    grid-template-columns: 1fr;
+  }
+
+  .role-card,
+  .timeline-item,
+  .comparison-card,
+  .comparison-column {
+    padding: 1.25rem;
+  }
+
+  .role-card {
+    min-height: auto;
+  }
+}

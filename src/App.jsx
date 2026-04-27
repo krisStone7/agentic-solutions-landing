@@ -1,4 +1,56 @@
 import React from 'react';
+
+const agentRoles = [
+  {
+    title: 'AI Receptionist',
+    summary: 'Responds quickly when customers reach out, even when the owner is busy.',
+    tasks: ['Answers common questions', 'Qualifies new leads', 'Books appointments', 'Sends reminders'],
+  },
+  {
+    title: 'AI Operations Assistant',
+    summary: 'Keeps routine business work moving without forcing everything through the owner.',
+    tasks: ['Tracks follow-ups', 'Updates CRMs and spreadsheets', 'Summarizes daily activity', 'Flags overdue work'],
+  },
+  {
+    title: 'AI Sales Assistant',
+    summary: 'Turns interest into organized opportunities with consistent follow-through.',
+    tasks: ['Replies to inbound leads', 'Drafts quotes', 'Maintains pipeline notes', 'Schedules next steps'],
+  },
+  {
+    title: 'AI Marketing Assistant',
+    summary: 'Helps turn business activity into useful content customers actually see.',
+    tasks: ['Drafts emails and posts', 'Repurposes ideas', 'Plans campaigns', 'Tracks engagement signals'],
+  },
+];
+
+const dayTimeline = [
+  {
+    time: '8:00 AM',
+    title: 'Morning briefing',
+    description: 'The owner receives a clean summary of new leads, unpaid invoices, appointments, and urgent messages.',
+  },
+  {
+    time: '10:30 AM',
+    title: 'New lead captured',
+    description: 'A website inquiry is answered automatically, qualified with a few smart questions, and routed into the right next step.',
+  },
+  {
+    time: '1:00 PM',
+    title: 'Follow-up sent',
+    description: 'The agent notices a quote has not been accepted and sends a polite follow-up before the opportunity goes cold.',
+  },
+  {
+    time: '4:30 PM',
+    title: 'Marketing draft prepared',
+    description: 'A recent customer win is turned into a draft email, social post, or testimonial request for review.',
+  },
+  {
+    time: 'End of day',
+    title: 'Work summarized',
+    description: 'The owner sees what was handled, what changed, and which decisions still need a human call.',
+  },
+];
+
 const services = [
   {
     title: 'Private AI Infrastructure Setup',
@@ -50,6 +102,7 @@ function App() {
         </a>
         <nav className="nav">
           <a href="#services">Services</a>
+          <a href="#ai-workforce">AI Workforce</a>
           <a href="#process">How It Works</a>
           <a href="#outcomes">Outcomes</a>
           <a href="#contact">Contact</a>
@@ -69,7 +122,7 @@ function App() {
             </p>
             <div className="hero-actions">
               <a className="button button-primary" href="#contact">
-                Book an Intro Call
+                See What Your First AI Agent Could Do
               </a>
               <a className="button button-secondary" href="#services">
                 Review Services
@@ -108,6 +161,84 @@ function App() {
                 <p>{service.description}</p>
               </article>
             ))}
+          </div>
+        </section>
+
+
+        <section className="section workforce-section" id="ai-workforce">
+          <div className="section-heading wide">
+            <p className="eyebrow">AI Workforce</p>
+            <h2>What can an AI agent actually do?</h2>
+            <p className="section-intro">
+              Think of an agentic workforce as a set of reliable digital teammates.
+              Each agent has a clear job, works inside your existing tools, and
+              brings decisions back to a human when judgment matters.
+            </p>
+          </div>
+
+          <div className="role-grid">
+            {agentRoles.map((role) => (
+              <article className="role-card" key={role.title}>
+                <div>
+                  <h3>{role.title}</h3>
+                  <p>{role.summary}</p>
+                </div>
+                <ul>
+                  {role.tasks.map((task) => (
+                    <li key={task}>{task}</li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section day-section" id="day-in-the-life">
+          <div className="section-heading wide">
+            <p className="eyebrow">A Day With Your AI Workforce</p>
+            <h2>Your business keeps moving while you run the business.</h2>
+            <p className="section-intro">
+              The goal is not novelty. The goal is fewer missed leads, fewer stale
+              follow-ups, less admin drag, and a clearer view of what needs your attention.
+            </p>
+          </div>
+          <div className="timeline">
+            {dayTimeline.map((item) => (
+              <article className="timeline-item" key={`${item.time}-${item.title}`}>
+                <span className="timeline-time">{item.time}</span>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="section comparison-section" id="not-a-chatbot">
+          <div className="comparison-card">
+            <div className="section-heading narrow">
+              <p className="eyebrow">Not Just A Chatbot</p>
+              <h2>Answers are useful. Action is better.</h2>
+            </div>
+            <div className="comparison-grid">
+              <div className="comparison-column muted-panel">
+                <h3>Traditional chatbot</h3>
+                <ul>
+                  <li>Waits for someone to click and ask a question</li>
+                  <li>Mostly answers from a fixed knowledge base</li>
+                  <li>Often leaves follow-up work to the owner</li>
+                </ul>
+              </div>
+              <div className="comparison-column accent-panel">
+                <h3>Agentic workforce</h3>
+                <ul>
+                  <li>Monitors the workflows that matter</li>
+                  <li>Updates tools, drafts responses, and completes routine tasks</li>
+                  <li>Escalates decisions with context instead of creating more noise</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -158,11 +289,11 @@ function App() {
         <section className="section cta-section" id="contact">
           <div className="cta-card">
             <p className="eyebrow">Call To Action</p>
-            <h2>Start with a straightforward setup conversation.</h2>
+            <h2>Start with a workflow audit for your first AI agent.</h2>
             <p>
-              If you need a clean foundation for private AI workflows, Agentic
-              Solutions can define the scope, stand up the infrastructure, and
-              make it usable for the people who will run it.
+              If you want to see where an AI workforce could save time, capture
+              missed opportunities, or reduce admin load, Agentic Solutions can
+              map the first useful workflow and build from there.
             </p>
             <p className="contact-note">Contact Kris Stone at Agentic Solutions.</p>
             <a className="button button-primary" href="mailto:agenticsolutions@agentmail.to">
