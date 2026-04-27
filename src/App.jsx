@@ -1,7 +1,7 @@
 import React from 'react';
 const services = [
   {
-    title: 'OpenClaw Environment Setup',
+    title: 'Private AI Infrastructure Setup',
     description:
       'Install and configure secure, repeatable agent workspaces with the right local tooling, project structure, and operating conventions.',
   },
@@ -19,7 +19,7 @@ const services = [
 
 const steps = [
   'Assess the operating context, existing tools, and the work that should be delegated to agents.',
-  'Stand up a clean OpenClaw-ready environment with practical defaults for local development and team usage.',
+  'Stand up private AI infrastructure with practical defaults for local development and team usage.',
   'Define workflows, prompts, safety rules, and review checkpoints so the system is useful on day one.',
   'Train the team on usage patterns, then refine based on real work rather than abstract demos.',
 ];
@@ -60,7 +60,7 @@ function App() {
         <section className="hero section">
           <div className="hero-copy">
             <p className="eyebrow">Los Angeles, California</p>
-            <h1>Practical setup for agentic systems and OpenClaw delivery.</h1>
+            <h1>Practical setup for private AI infrastructure.</h1>
             <p className="lead">
               Agentic Solutions helps teams launch clean, usable environments for
               agent-assisted work. The focus is straightforward: reliable setup,
@@ -160,10 +160,11 @@ function App() {
             <p className="eyebrow">Call To Action</p>
             <h2>Start with a straightforward setup conversation.</h2>
             <p>
-              If you need a clean foundation for agentic workflows, Agentic
-              Solutions can help define the scope, stand up the environment, and
+              If you need a clean foundation for private AI workflows, Agentic
+              Solutions can define the scope, stand up the infrastructure, and
               make it usable for the people who will run it.
             </p>
+            <p className="contact-note">Contact Kris Stone at Agentic Solutions.</p>
             <a className="button button-primary" href="mailto:agenticsolutions@agentmail.to">
               agenticsolutions@agentmail.to
             </a>
