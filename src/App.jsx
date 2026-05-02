@@ -98,7 +98,7 @@ function App() {
           <span className="brand-mark" aria-hidden="true">
             AS
           </span>
-          <span>Agentic Solutions</span>
+          <span>Stonebridge AI</span>
         </a>
         <nav className="nav">
           <a href="#services">Services</a>
@@ -115,7 +115,7 @@ function App() {
             <p className="eyebrow">Los Angeles, California</p>
             <h1>Practical setup for private AI infrastructure.</h1>
             <p className="lead">
-              Agentic Solutions helps teams launch clean, usable environments for
+              Stonebridge AI helps teams launch clean, usable environments for
               agent-assisted work. The focus is straightforward: reliable setup,
               workable operating patterns, and outcomes that hold up under real
               project pressure.
@@ -170,7 +170,7 @@ function App() {
             <p className="eyebrow">AI Workforce</p>
             <h2>What can an AI agent actually do?</h2>
             <p className="section-intro">
-              Think of an agentic workforce as a set of reliable digital teammates.
+              Think of an AI workforce as a set of reliable digital teammates.
               Each agent has a clear job, works inside your existing tools, and
               brings decisions back to a human when judgment matters.
             </p>
@@ -231,7 +231,7 @@ function App() {
                 </ul>
               </div>
               <div className="comparison-column accent-panel">
-                <h3>Agentic workforce</h3>
+                <h3>AI workforce</h3>
                 <ul>
                   <li>Monitors the workflows that matter</li>
                   <li>Updates tools, drafts responses, and completes routine tasks</li>
@@ -292,12 +292,12 @@ function App() {
             <h2>Start with a workflow audit for your first AI agent.</h2>
             <p>
               If you want to see where an AI workforce could save time, capture
-              missed opportunities, or reduce admin load, Agentic Solutions can
+              missed opportunities, or reduce admin load, Stonebridge AI can
               map the first useful workflow and build from there.
             </p>
-            <p className="contact-note">Contact Kris Stone at Agentic Solutions.</p>
-            <a className="button button-primary" href="mailto:agenticsolutions@agentmail.to">
-              agenticsolutions@agentmail.to
+            <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
+            <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
+              stonebridgeai@agentmail.to
             </a>
           </div>
         </section>

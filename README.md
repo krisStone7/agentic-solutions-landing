@@ -1,6 +1,6 @@
-# Agentic Solutions Landing Page
+# Stonebridge AI Landing Page
 
-Minimal Vite-style React starter for a one-page business landing page for Agentic Solutions in Los Angeles, CA.
+Minimal Vite-style React starter for a one-page business landing page for Stonebridge AI in Los Angeles, CA.
 
 ## Run locally
 
