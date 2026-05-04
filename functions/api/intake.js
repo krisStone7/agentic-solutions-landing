@@ -4,13 +4,13 @@ const INBOX_ID = 'stonebridgeai@agentmail.to';
 
 const allowedOrigins = new Set([
   'https://stonebridge-ai-landing.pages.dev',
+  'https://agentic-solutions-landing.pages.dev',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
 ]);
 
-function jsonResponse(payload, status = 200, origin = '') {
+function corsHeaders(origin = '') {
   const headers = {
-    'Content-Type': 'application/json',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
@@ -19,7 +19,17 @@ function jsonResponse(payload, status = 200, origin = '') {
     headers['Access-Control-Allow-Origin'] = origin;
   }
 
-  return new Response(JSON.stringify(payload), { status, headers });
+  return headers;
+}
+
+function jsonResponse(payload, status = 200, origin = '') {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...corsHeaders(origin),
+    },
+  });
 }
 
 function clean(value) {
@@ -72,7 +82,10 @@ function renderSubmission(data) {
 }
 
 export async function onRequestOptions({ request }) {
-  return jsonResponse({}, 204, request.headers.get('Origin') || '');
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders(request.headers.get('Origin') || ''),
+  });
 }
 
 export async function onRequestPost({ request, env }) {

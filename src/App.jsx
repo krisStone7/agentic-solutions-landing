@@ -209,8 +209,10 @@ function App() {
     } catch (error) {
       setFormStatus({
         state: 'error',
-        message: `${error.message} Please use the email fallback below.`,
+        message: `${error.message} Opening your email app with this intake as a fallback.`,
       });
+
+      window.location.href = fallbackHref;
     }
   };
 
@@ -244,6 +246,7 @@ Timeline: ${intakeForm.timeline}
 Anything else:
 ${intakeForm.notes}`,
   );
+  const fallbackHref = `mailto:stonebridgeai@agentmail.to?subject=AI%20Integration%20Readiness%20Intake&body=${fallbackBody}`;
 
   return (
     <div className="page-shell">
@@ -669,7 +672,7 @@ ${intakeForm.notes}`,
               </button>
               <a
                 className="button button-secondary"
-                href={`mailto:stonebridgeai@agentmail.to?subject=AI%20Integration%20Readiness%20Intake&body=${fallbackBody}`}
+                href={fallbackHref}
               >
                 Email fallback
               </a>
