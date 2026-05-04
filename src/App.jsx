@@ -268,7 +268,6 @@ ${intakeForm.notes}`,
       <main id="top">
         <section className="hero section">
           <div className="hero-copy">
-            <p className="eyebrow">Los Angeles, California</p>
             <h1>Practical setup for private AI infrastructure.</h1>
             <p className="lead">
               Stonebridge AI helps teams launch clean, usable environments for
@@ -693,6 +692,7 @@ ${intakeForm.notes}`,
               from a clear implementation roadmap.
             </p>
             <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
+            <p className="contact-location">Los Angeles, California</p>
             <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
               stonebridgeai@agentmail.to
             </a>
