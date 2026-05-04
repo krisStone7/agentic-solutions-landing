@@ -142,7 +142,7 @@ export async function onRequestPost({ request, env }) {
 
   const text = renderSubmission(data);
 
-  const response = await fetch(`https://api.agentmail.to/v0/inboxes/${encodeURIComponent(INBOX_ID)}/messages`, {
+  const response = await fetch(`https://api.agentmail.to/v0/inboxes/${encodeURIComponent(INBOX_ID)}/messages/send`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${env.AGENTMAIL_API_KEY}`,
