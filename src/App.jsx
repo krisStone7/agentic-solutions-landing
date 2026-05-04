@@ -250,7 +250,7 @@ ${intakeForm.notes}`,
       <header className="topbar">
         <a className="brand" href="#top">
           <span className="brand-mark" aria-hidden="true">
-            AS
+            SAI
           </span>
           <span>Stonebridge AI</span>
         </a>
