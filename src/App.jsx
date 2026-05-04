@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 
 const auditDeliverables = [
@@ -14,6 +14,66 @@ const auditBestFor = [
   'Teams stuck in email, spreadsheets, CRMs, ticket queues, or manual reporting',
   'Operations-heavy businesses that need useful automation, not novelty demos',
 ];
+
+
+const toolOptions = [
+  'Email',
+  'Calendar',
+  'CRM',
+  'Help desk or ticketing',
+  'Project management',
+  'Chat or internal comms',
+  'Document storage',
+  'Spreadsheets',
+  'Accounting or invoicing',
+  'ERP/MRP',
+  'Ecommerce',
+  'Scheduling or booking',
+  'Forms or surveys',
+  'Databases',
+  'Internal custom software',
+];
+
+const interestOptions = [
+  'AI Integration Readiness Audit',
+  'Implementation help now',
+  'Exploring options',
+  'Not sure yet',
+];
+
+const budgetOptions = [
+  'Under $2,500',
+  '$2,500-$5,000',
+  '$5,000-$15,000',
+  '$15,000-$50,000',
+  '$50,000+',
+  'Not sure yet',
+];
+
+const timelineOptions = [
+  'Immediately or within 2 weeks',
+  '30 days',
+  '60-90 days',
+  '3-6 months',
+  'Exploring only',
+];
+
+const initialIntakeForm = {
+  name: '',
+  email: '',
+  company: '',
+  website: '',
+  business: '',
+  workflow: '',
+  tools: [],
+  otherTools: '',
+  bottlenecks: '',
+  sensitiveData: '',
+  interest: '',
+  budget: '',
+  timeline: '',
+  notes: '',
+};
 
 const agentRoles = [
   {
@@ -106,6 +166,85 @@ const audiences = [
 ];
 
 function App() {
+  const [intakeForm, setIntakeForm] = useState(initialIntakeForm);
+  const [formStatus, setFormStatus] = useState({ state: 'idle', message: '' });
+
+  const updateField = (event) => {
+    const { name, value } = event.target;
+    setIntakeForm((current) => ({ ...current, [name]: value }));
+  };
+
+  const updateToolSelection = (event) => {
+    const { value, checked } = event.target;
+    setIntakeForm((current) => ({
+      ...current,
+      tools: checked
+        ? [...current.tools, value]
+        : current.tools.filter((tool) => tool !== value),
+    }));
+  };
+
+  const handleIntakeSubmit = async (event) => {
+    event.preventDefault();
+    setFormStatus({ state: 'submitting', message: 'Sending intake response...' });
+
+    try {
+      const response = await fetch('/api/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(intakeForm),
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(result.error || 'The intake function is not available yet.');
+      }
+
+      setFormStatus({
+        state: 'success',
+        message: 'Thanks. Your intake was sent to Stonebridge AI.',
+      });
+      setIntakeForm(initialIntakeForm);
+    } catch (error) {
+      setFormStatus({
+        state: 'error',
+        message: `${error.message} Please use the email fallback below.`,
+      });
+    }
+  };
+
+  const fallbackBody = encodeURIComponent(
+    `AI Integration Readiness Intake
+
+Name: ${intakeForm.name}
+Email: ${intakeForm.email}
+Company: ${intakeForm.company}
+Website: ${intakeForm.website}
+
+What the company does:
+${intakeForm.business}
+
+Workflow to improve:
+${intakeForm.workflow}
+
+Tools:
+${[...intakeForm.tools, intakeForm.otherTools].filter(Boolean).join(', ')}
+
+Where work gets stuck:
+${intakeForm.bottlenecks}
+
+Sensitive data/access concerns:
+${intakeForm.sensitiveData}
+
+Interest: ${intakeForm.interest}
+Budget: ${intakeForm.budget}
+Timeline: ${intakeForm.timeline}
+
+Anything else:
+${intakeForm.notes}`,
+  );
+
   return (
     <div className="page-shell">
       <header className="topbar">
@@ -118,6 +257,7 @@ function App() {
         <nav className="nav">
           <a href="#services">Services</a>
           <a href="#readiness-audit">Readiness Audit</a>
+          <a href="#intake">Intake</a>
           <a href="#ai-workforce">AI Workforce</a>
           <a href="#process">How It Works</a>
           <a href="#outcomes">Outcomes</a>
@@ -192,7 +332,7 @@ function App() {
                   <strong>$3,500 fixed-price standard audit</strong>
                   <p>Creditable toward an approved implementation project.</p>
                 </div>
-                <a className="button button-primary" href="#contact">
+                <a className="button button-primary" href="#intake">
                   Request a Readiness Audit
                 </a>
               </div>
@@ -353,6 +493,193 @@ function App() {
               </div>
             ))}
           </div>
+        </section>
+
+
+        <section className="section intake-section" id="intake">
+          <div className="section-heading wide">
+            <p className="eyebrow">Client Intake</p>
+            <h2>Tell us where AI could help first.</h2>
+            <p className="section-intro">
+              Share the workflow, tools, constraints, and timeline. Stonebridge AI
+              will use this to recommend the right next step: readiness audit,
+              implementation scope, or a quick discovery call.
+            </p>
+          </div>
+
+          <form className="intake-form" onSubmit={handleIntakeSubmit}>
+            <div className="form-grid two-column">
+              <label>
+                <span>Name *</span>
+                <input
+                  name="name"
+                  type="text"
+                  value={intakeForm.name}
+                  onChange={updateField}
+                  autoComplete="name"
+                  required
+                />
+              </label>
+              <label>
+                <span>Email *</span>
+                <input
+                  name="email"
+                  type="email"
+                  value={intakeForm.email}
+                  onChange={updateField}
+                  autoComplete="email"
+                  required
+                />
+              </label>
+              <label>
+                <span>Company *</span>
+                <input
+                  name="company"
+                  type="text"
+                  value={intakeForm.company}
+                  onChange={updateField}
+                  autoComplete="organization"
+                  required
+                />
+              </label>
+              <label>
+                <span>Website</span>
+                <input
+                  name="website"
+                  type="url"
+                  value={intakeForm.website}
+                  onChange={updateField}
+                  placeholder="https://example.com"
+                />
+              </label>
+            </div>
+
+            <label>
+              <span>What does your company do? *</span>
+              <textarea
+                name="business"
+                value={intakeForm.business}
+                onChange={updateField}
+                rows="3"
+                required
+              />
+            </label>
+
+            <label>
+              <span>What workflow do you most want to improve with AI? *</span>
+              <textarea
+                name="workflow"
+                value={intakeForm.workflow}
+                onChange={updateField}
+                rows="3"
+                required
+              />
+            </label>
+
+            <fieldset className="checkbox-fieldset">
+              <legend>What tools does your team use today?</legend>
+              <div className="checkbox-grid">
+                {toolOptions.map((tool) => (
+                  <label className="checkbox-option" key={tool}>
+                    <input
+                      type="checkbox"
+                      value={tool}
+                      checked={intakeForm.tools.includes(tool)}
+                      onChange={updateToolSelection}
+                    />
+                    <span>{tool}</span>
+                  </label>
+                ))}
+              </div>
+              <label className="other-tools">
+                <span>Other tools</span>
+                <input
+                  name="otherTools"
+                  type="text"
+                  value={intakeForm.otherTools}
+                  onChange={updateField}
+                />
+              </label>
+            </fieldset>
+
+            <label>
+              <span>Where does work get stuck or repetitive? *</span>
+              <textarea
+                name="bottlenecks"
+                value={intakeForm.bottlenecks}
+                onChange={updateField}
+                rows="3"
+                required
+              />
+            </label>
+
+            <label>
+              <span>What sensitive data or access concerns should we know about?</span>
+              <textarea
+                name="sensitiveData"
+                value={intakeForm.sensitiveData}
+                onChange={updateField}
+                rows="3"
+                placeholder="Customer data, financial data, regulated data, proprietary technical data, systems we should not access directly, etc."
+              />
+            </label>
+
+            <div className="form-grid three-column">
+              <label>
+                <span>What are you interested in? *</span>
+                <select name="interest" value={intakeForm.interest} onChange={updateField} required>
+                  <option value="">Select one</option>
+                  {interestOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Budget range</span>
+                <select name="budget" value={intakeForm.budget} onChange={updateField}>
+                  <option value="">Select one</option>
+                  {budgetOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Timeline</span>
+                <select name="timeline" value={intakeForm.timeline} onChange={updateField}>
+                  <option value="">Select one</option>
+                  {timelineOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>Anything else?</span>
+              <textarea
+                name="notes"
+                value={intakeForm.notes}
+                onChange={updateField}
+                rows="3"
+              />
+            </label>
+
+            <div className="form-actions">
+              <button className="button button-primary" type="submit" disabled={formStatus.state === 'submitting'}>
+                {formStatus.state === 'submitting' ? 'Sending...' : 'Submit Intake'}
+              </button>
+              <a
+                className="button button-secondary"
+                href={`mailto:stonebridgeai@agentmail.to?subject=AI%20Integration%20Readiness%20Intake&body=${fallbackBody}`}
+              >
+                Email fallback
+              </a>
+            </div>
+
+            {formStatus.message && (
+              <p className={`form-status ${formStatus.state}`}>{formStatus.message}</p>
+            )}
+          </form>
         </section>
 
         <section className="section cta-section" id="contact">
