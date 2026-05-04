@@ -1,5 +1,20 @@
 import React from 'react';
 
+
+const auditDeliverables = [
+  'Workflow and systems map',
+  'AI opportunity register ranked by value, effort, and risk',
+  'Top 3 recommended initiatives with implementation outlines',
+  'Data, security, and human-approval guardrails',
+  '30/60/90 day implementation roadmap',
+];
+
+const auditBestFor = [
+  'Owners who know AI matters but are not sure where to start',
+  'Teams stuck in email, spreadsheets, CRMs, ticket queues, or manual reporting',
+  'Operations-heavy businesses that need useful automation, not novelty demos',
+];
+
 const agentRoles = [
   {
     title: 'AI Receptionist',
@@ -102,6 +117,7 @@ function App() {
         </a>
         <nav className="nav">
           <a href="#services">Services</a>
+          <a href="#readiness-audit">Readiness Audit</a>
           <a href="#ai-workforce">AI Workforce</a>
           <a href="#process">How It Works</a>
           <a href="#outcomes">Outcomes</a>
@@ -147,6 +163,59 @@ function App() {
               </li>
             </ul>
           </aside>
+        </section>
+
+
+        <section className="section audit-section" id="readiness-audit">
+          <div className="audit-card">
+            <div className="section-heading wide">
+              <p className="eyebrow">First Offer</p>
+              <h2>Start with an AI Integration Readiness Audit.</h2>
+              <p className="section-intro">
+                Stop guessing where AI belongs in the business. Stonebridge AI
+                maps your real workflows, identifies high-leverage automation
+                opportunities, and gives you a practical roadmap grounded in
+                your tools, data, and risk profile.
+              </p>
+            </div>
+
+            <div className="audit-layout">
+              <div className="audit-summary">
+                <p>
+                  The audit is a focused entry engagement for companies that want
+                  practical AI integration but are not ready to commit to a full
+                  build. It separates quick wins from architecture-heavy work and
+                  gives leadership a clear next step.
+                </p>
+                <div className="audit-price">
+                  <span>Recommended starting point</span>
+                  <strong>$3,500 fixed-price standard audit</strong>
+                  <p>Creditable toward an approved implementation project.</p>
+                </div>
+                <a className="button button-primary" href="#contact">
+                  Request a Readiness Audit
+                </a>
+              </div>
+
+              <div className="audit-list-panel">
+                <h3>What you get</h3>
+                <ul>
+                  {auditDeliverables.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="audit-list-panel muted-panel">
+                <h3>Best for</h3>
+                <ul>
+                  {auditBestFor.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="section" id="services">
@@ -289,11 +358,12 @@ function App() {
         <section className="section cta-section" id="contact">
           <div className="cta-card">
             <p className="eyebrow">Call To Action</p>
-            <h2>Start with a workflow audit for your first AI agent.</h2>
+            <h2>Start with an AI Integration Readiness Audit.</h2>
             <p>
               If you want to see where an AI workforce could save time, capture
               missed opportunities, or reduce admin load, Stonebridge AI can
-              map the first useful workflow and build from there.
+              map the first useful workflow, rank the opportunities, and build
+              from a clear implementation roadmap.
             </p>
             <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
             <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
