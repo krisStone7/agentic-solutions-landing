@@ -5,6 +5,8 @@ const INBOX_ID = 'stonebridgeai@agentmail.to';
 const allowedOrigins = new Set([
   'https://stonebridge-ai-landing.pages.dev',
   'https://agentic-solutions-landing.pages.dev',
+  'https://stonebridgebai.com',
+  'https://www.stonebridgebai.com',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
 ]);
