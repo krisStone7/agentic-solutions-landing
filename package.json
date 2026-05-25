@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lead:summary": "node scripts/lead-summary.mjs",
-    "test:lead-summary": "node --test test/lead-summary.test.mjs"
+    "test:lead-summary": "node --test test/lead-summary.test.mjs",
+    "lead:draft": "node scripts/lead-summary.mjs --include-draft"
   },
   "dependencies": {
     "react": "^18.3.1",

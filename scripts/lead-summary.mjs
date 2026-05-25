@@ -20,6 +20,7 @@ function parseArgs(argv) {
     format: 'markdown',
     file: '',
     messageId: '',
+    includeDraft: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -31,6 +32,7 @@ function parseArgs(argv) {
     else if (arg === '--format') args.format = next();
     else if (arg === '--file') args.file = next();
     else if (arg === '--message-id') args.messageId = next();
+    else if (arg === '--include-draft') args.includeDraft = true;
     else if (arg === '--help' || arg === '-h') args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -42,6 +44,7 @@ function usage() {
   npm run lead:summary
   npm run lead:summary -- --message-id <agentmail-message-id>
   npm run lead:summary -- --file test/fixtures/e2e-intake.txt
+  npm run lead:draft
 
 Options:
   --inbox <email>        AgentMail inbox, default ${DEFAULT_INBOX}
@@ -50,6 +53,7 @@ Options:
   --message-id <id>      Summarize a specific AgentMail message
   --file <path>          Parse a local intake text file, useful for tests
   --format markdown|json Output format, default markdown
+  --include-draft      Generate a staged follow-up draft. Never sends.
 
 Environment:
   AGENTMAIL_API_KEY is required unless --file is used.
@@ -229,7 +233,7 @@ function recommendedAction({ fit, urgency, missing, injectionFlag }) {
   return 'Schedule a discovery conversation and confirm the first workflow to automate.';
 }
 
-function buildSummary(message, source) {
+function buildSummary(message, source, options = {}) {
   const text = message.text || message.extracted_text || message.preview || '';
   const fields = parseIntake(text);
   const fit = scoreFit(fields, text);
@@ -237,7 +241,7 @@ function buildSummary(message, source) {
   const missing = missingInfo(fields);
   const injectionFlag = detectInjection(text);
 
-  return {
+  const summary = {
     source,
     messageId: message.message_id || 'unknown',
     subject: message.subject || '(no subject)',
@@ -263,9 +267,105 @@ function buildSummary(message, source) {
     missingInformation: missing.length ? missing : ['None obvious from intake.'],
     promptInjectionRisk: injectionFlag ? 'flagged' : 'none detected',
     recommendedNextAction: recommendedAction({ fit, urgency, missing, injectionFlag }),
-    draftReply: 'Not generated in Phase 1. Outbound drafting starts in Phase 2 and remains staged for approval.',
+    draftReply: 'Not generated. Pass --include-draft or run npm run lead:draft to stage a Phase 2 follow-up draft.',
+  };
+
+  if (options.includeDraft) {
+    summary.draftReply = buildDraftReply(summary);
+  }
+
+  return summary;
+}
+
+function firstName(name) {
+  const clean = String(name || '').trim();
+  if (!clean || clean === 'Not provided') return 'there';
+  return clean.split(/\s+/)[0];
+}
+
+function compactLine(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function sentenceText(value) {
+  const text = compactLine(value);
+  return text.replace(/[.?!]+$/u, '');
+}
+
+function draftQuestions(summary) {
+  const missing = summary.missingInformation.filter((item) => item !== 'None obvious from intake.');
+  const questions = [];
+
+  if (missing.includes('specific success metric')) {
+    questions.push('What would a successful first automation save or improve, for example hours per week, response time, error rate, or handoff quality?');
+  }
+  if (missing.includes('sensitive-data/access boundaries')) {
+    questions.push('What systems or data would be in scope, and are there any access, security, or compliance boundaries I should design around?');
+  }
+  if (missing.includes('budget')) {
+    questions.push('Do you already have a target budget or pilot range in mind?');
+  }
+  if (missing.includes('timeline')) {
+    questions.push('Is there a deadline or operational event driving the timeline?');
+  }
+  if (questions.length < 2) {
+    questions.push('Which workflow step should we inspect first so I can scope a small, low-risk pilot?');
+  }
+  if (questions.length < 3) {
+    questions.push('Who owns the current process and who should be involved in a discovery call?');
+  }
+
+  return questions.slice(0, 3);
+}
+
+function buildDraftReply(summary) {
+  const c = summary.companyAndContact;
+  if (summary.promptInjectionRisk === 'flagged') {
+    return {
+      status: 'blocked',
+      reason: 'Prompt-injection-looking content was detected in the submitted lead. Review manually before drafting.',
+      approvalRequired: true,
+      sendAction: false,
+    };
+  }
+
+  if (summary.fitScore === 'low') {
+    return {
+      status: 'not_recommended',
+      reason: 'Lead appears to be QA, synthetic, or low-fit. No external follow-up draft is recommended.',
+      approvalRequired: true,
+      sendAction: false,
+    };
+  }
+
+  const subject = `Re: ${compactLine(c.company)} AI workflow automation`;
+  const questions = draftQuestions(summary);
+  const body = [
+    `Hi ${firstName(c.name)},`,
+    '',
+    `Thanks for reaching out about ${compactLine(c.company)}. Based on your intake, it sounds like the first useful target is: ${sentenceText(summary.workflowTheyWantImproved)}.`,
+    '',
+    `The bottleneck I’d want to understand first is: ${sentenceText(summary.bottlenecks)}. From there, I’d look for a small pilot that can prove value without needing broad system access up front.`,
+    '',
+    'A few quick questions so I can scope this correctly:',
+    ...questions.map((question) => `- ${question}`),
+    '',
+    'If helpful, I can also suggest a lightweight discovery call agenda and a pilot shape after I have those answers.',
+    '',
+    'Best,',
+    'Kris',
+  ].join('\n');
+
+  return {
+    status: 'staged',
+    subject,
+    body,
+    approvalRequired: true,
+    sendAction: false,
+    note: 'Draft only. Do not send without explicit Kris approval.',
   };
 }
+
 
 function renderMarkdown(summary) {
   const c = summary.companyAndContact;
@@ -300,11 +400,20 @@ function renderMarkdown(summary) {
     '',
     `Recommended next action: ${summary.recommendedNextAction}`,
     '',
-    `Draft reply: ${summary.draftReply}`,
+    typeof summary.draftReply === 'string'
+      ? `Draft reply: ${summary.draftReply}`
+      : [
+          'Draft reply: STAGED ONLY, approval required, not sent',
+          `Subject: ${summary.draftReply.subject || '(none)'}`,
+          '',
+          summary.draftReply.body || summary.draftReply.reason || '(no body)',
+          '',
+          `Send action: ${summary.draftReply.sendAction ? 'enabled' : 'disabled'}`,
+        ].join('\n'),
   ].join('\n');
 }
 
-export { parseIntake, buildSummary, renderMarkdown };
+export { parseIntake, buildSummary, renderMarkdown, buildDraftReply };
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -313,7 +422,7 @@ async function main() {
     return;
   }
   const { source, message } = await loadLead(args);
-  const summary = buildSummary(message, source);
+  const summary = buildSummary(message, source, { includeDraft: args.includeDraft });
   if (args.format === 'json') console.log(JSON.stringify(summary, null, 2));
   else if (args.format === 'markdown') console.log(renderMarkdown(summary));
   else throw new Error(`Unsupported format: ${args.format}`);

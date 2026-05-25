@@ -1,0 +1,28 @@
+New AI Integration Readiness Intake
+
+Name: Jordan Lee
+Email: jordan@example.com
+Company: Acme Field Services
+Website: https://acme.example
+
+What the company does:
+Regional field service company handling installation and maintenance dispatch.
+
+Workflow to improve:
+Automate website intake, email triage, CRM updates, and follow-up scheduling for new service requests.
+
+Tools:
+Email, Calendar, HubSpot, Google Sheets
+
+Where work gets stuck:
+Requests arrive in several inboxes and coordinators manually copy details into the CRM before scheduling.
+
+Sensitive data or access concerns:
+Customer contact details and job addresses. No payment or health data.
+
+Interest: Ready for a pilot
+Budget: Not provided
+Timeline: This month
+
+Anything else:
+They want a low-risk proof of concept before broader access.
