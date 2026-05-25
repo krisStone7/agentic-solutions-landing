@@ -5,7 +5,7 @@
  * Fetches AgentMail messages labeled `website-intake`, parses the latest intake,
  * and prints the Phase 1 summary format. No outbound actions are performed.
  */
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +27,10 @@ function parseArgs(argv) {
     createTask: false,
     taskFile: DEFAULT_TASK_FILE,
     now: '',
+    listTasks: false,
+    markHandled: '',
+    handledNote: '',
+    allTasks: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -42,6 +46,10 @@ function parseArgs(argv) {
     else if (arg === '--create-task') args.createTask = true;
     else if (arg === '--task-file') args.taskFile = next();
     else if (arg === '--now') args.now = next();
+    else if (arg === '--list-tasks') args.listTasks = true;
+    else if (arg === '--mark-handled') args.markHandled = next();
+    else if (arg === '--handled-note') args.handledNote = next();
+    else if (arg === '--all') args.allTasks = true;
     else if (arg === '--help' || arg === '-h') args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -55,6 +63,7 @@ function usage() {
   npm run lead:summary -- --file test/fixtures/e2e-intake.txt
   npm run lead:draft
   npm run lead:task
+  npm run lead:tasks
 
 Options:
   --inbox <email>        AgentMail inbox, default ${DEFAULT_INBOX}
@@ -67,6 +76,10 @@ Options:
   --create-task        Append an internal follow-up item to a local JSONL queue.
   --task-file <path>   Task queue file, default ${DEFAULT_TASK_FILE}
   --now <iso-date>     Override current time for deterministic tests.
+  --list-tasks        List internal follow-up tasks from the local JSONL queue.
+  --mark-handled <id> Mark an internal task handled in the local JSONL queue.
+  --handled-note <txt> Note to store when marking handled.
+  --all               Include handled tasks when listing.
 
 Environment:
   AGENTMAIL_API_KEY is required unless --file is used.
@@ -480,6 +493,130 @@ function appendFollowUpTask(task, taskFile) {
   return { created: true, taskFile, task };
 }
 
+
+function readTaskQueue(taskFile) {
+  if (!existsSync(taskFile)) return [];
+  const tasks = [];
+  for (const [index, line] of readFileSync(taskFile, 'utf8').split('\n').entries()) {
+    if (!line.trim()) continue;
+    try {
+      tasks.push(JSON.parse(line));
+    } catch (error) {
+      throw new Error(`Could not parse ${taskFile} line ${index + 1}: ${error.message}`);
+    }
+  }
+  return tasks;
+}
+
+function writeTaskQueue(tasks, taskFile) {
+  mkdirSync(dirname(taskFile), { recursive: true });
+  const body = tasks.map((task) => JSON.stringify(task)).join('\n');
+  writeFileSync(taskFile, body ? `${body}\n` : '', 'utf8');
+}
+
+function isTaskOverdue(task, now = new Date()) {
+  if (task.status !== 'open') return false;
+  if (!task.dueDate) return false;
+  return task.dueDate < isoDate(now);
+}
+
+function taskSortKey(task) {
+  const priorityRank = { high: 0, medium: 1, low: 2 };
+  return [task.status === 'open' ? 0 : 1, task.dueDate || '9999-99-99', priorityRank[task.priority] ?? 9, task.createdAt || ''];
+}
+
+function compareTasks(a, b) {
+  const left = taskSortKey(a);
+  const right = taskSortKey(b);
+  for (let i = 0; i < left.length; i += 1) {
+    if (left[i] < right[i]) return -1;
+    if (left[i] > right[i]) return 1;
+  }
+  return 0;
+}
+
+function listFollowUpTasks(taskFile, options = {}) {
+  const now = parseDate(options.now);
+  const allTasks = readTaskQueue(taskFile).sort(compareTasks);
+  const tasks = options.all ? allTasks : allTasks.filter((task) => task.status === 'open');
+  return {
+    taskFile,
+    now: now.toISOString(),
+    total: allTasks.length,
+    shown: tasks.length,
+    open: allTasks.filter((task) => task.status === 'open').length,
+    overdue: allTasks.filter((task) => isTaskOverdue(task, now)).length,
+    tasks: tasks.map((task) => ({ ...task, overdue: isTaskOverdue(task, now) })),
+  };
+}
+
+function markTaskHandled(taskFile, taskId, options = {}) {
+  if (!taskId) throw new Error('--mark-handled requires a task id.');
+  const now = parseDate(options.now);
+  const tasks = readTaskQueue(taskFile);
+  const index = tasks.findIndex((task) => task.id === taskId);
+  if (index === -1) throw new Error(`Task not found: ${taskId}`);
+  const task = tasks[index];
+  if (task.status === 'handled') {
+    return { changed: false, taskFile, task };
+  }
+  tasks[index] = {
+    ...task,
+    status: 'handled',
+    handledAt: now.toISOString(),
+    handledNote: options.note || 'Marked handled internally. No external action was performed by this command.',
+    externalActionPerformed: false,
+  };
+  writeTaskQueue(tasks, taskFile);
+  return { changed: true, taskFile, task: tasks[index] };
+}
+
+function renderTaskListMarkdown(result) {
+  const lines = [
+    '# Stonebridge AI Lead Follow-up Tasks',
+    '',
+    `Queue file: ${result.taskFile}`,
+    `Open: ${result.open}`,
+    `Overdue: ${result.overdue}`,
+    `Shown: ${result.shown} of ${result.total}`,
+  ];
+
+  if (!result.tasks.length) {
+    lines.push('', 'No matching tasks.');
+    return lines.join('\n');
+  }
+
+  for (const task of result.tasks) {
+    const overdue = task.overdue ? ' OVERDUE' : '';
+    const lead = task.lead || {};
+    lines.push(
+      '',
+      `- ${task.id} [${task.status}] ${task.priority || 'unknown'}${overdue}`,
+      `  Title: ${task.title}`,
+      `  Due: ${task.dueDate || 'none'}`,
+      `  Lead: ${lead.company || 'Unknown'}${lead.email ? ` <${lead.email}>` : ''}`,
+      `  Next: ${task.nextAction || 'Not provided'}`,
+      `  External action enabled: no`,
+    );
+  }
+
+  return lines.join('\n');
+}
+
+function renderHandledMarkdown(result) {
+  const task = result.task;
+  return [
+    '# Stonebridge AI Lead Task Update',
+    '',
+    `Task ${result.changed ? 'marked handled' : 'already handled'}: ${task.id}`,
+    `Queue file: ${result.taskFile}`,
+    `Title: ${task.title}`,
+    `Status: ${task.status}`,
+    `Handled at: ${task.handledAt || 'previously handled'}`,
+    `External action performed by this command: no`,
+  ].join('\n');
+}
+
 function renderTaskMarkdown(taskResult) {
   const verb = taskResult.created ? 'created' : 'already queued';
   const task = taskResult.task;
@@ -554,6 +691,8 @@ export {
   buildDraftReply,
   buildFollowUpTask,
   appendFollowUpTask,
+  listFollowUpTasks,
+  markTaskHandled,
 };
 
 async function main() {
@@ -562,6 +701,22 @@ async function main() {
     console.log(usage());
     return;
   }
+  if (args.markHandled) {
+    const result = markTaskHandled(args.taskFile, args.markHandled, { now: args.now, note: args.handledNote });
+    if (args.format === 'json') console.log(JSON.stringify(result, null, 2));
+    else if (args.format === 'markdown') console.log(renderHandledMarkdown(result));
+    else throw new Error(`Unsupported format: ${args.format}`);
+    return;
+  }
+
+  if (args.listTasks) {
+    const result = listFollowUpTasks(args.taskFile, { now: args.now, all: args.allTasks });
+    if (args.format === 'json') console.log(JSON.stringify(result, null, 2));
+    else if (args.format === 'markdown') console.log(renderTaskListMarkdown(result));
+    else throw new Error(`Unsupported format: ${args.format}`);
+    return;
+  }
+
   const { source, message } = await loadLead(args);
   const includeDraft = args.includeDraft || args.createTask;
   const summary = buildSummary(message, source, { includeDraft });

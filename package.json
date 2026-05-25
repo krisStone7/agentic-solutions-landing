@@ -10,7 +10,8 @@
     "lead:summary": "node scripts/lead-summary.mjs",
     "test:lead-summary": "node --test test/lead-summary.test.mjs",
     "lead:draft": "node scripts/lead-summary.mjs --include-draft",
-    "lead:task": "node scripts/lead-summary.mjs --create-task"
+    "lead:task": "node scripts/lead-summary.mjs --create-task",
+    "lead:tasks": "node scripts/lead-summary.mjs --list-tasks"
   },
   "dependencies": {
     "react": "^18.3.1",

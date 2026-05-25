@@ -65,7 +65,30 @@ Expected talking points:
 - Approval is required before any send/calendar/CRM/Discord action.
 - Re-running the command is idempotent and reports the same task as already queued.
 
-### 4. Optional live inbox proof
+
+### 5. Review open internal follow-up tasks
+
+```bash
+npm run lead:tasks -- --task-file tmp/demo-lead-followups.jsonl
+```
+
+Expected talking points:
+
+- Open tasks are sorted by status, due date, and priority.
+- Overdue tasks are flagged.
+- The list shows the next action and confirms external action is disabled.
+
+### 6. Mark a demo task handled
+
+Use the task id shown by `lead:task` or `lead:tasks`:
+
+```bash
+npm run lead:tasks -- --task-file tmp/demo-lead-followups.jsonl --mark-handled lead-4cf5f0e38dbd --handled-note "Handled in demo only."
+```
+
+Expected talking point: marking handled updates only the local queue. It does not send email, create calendar events, or touch CRM.
+
+### 7. Optional live inbox proof
 
 Only if Kris wants to show the live integration path:
 

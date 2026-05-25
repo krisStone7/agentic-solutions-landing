@@ -107,7 +107,7 @@ Validation:
 
 ### Phase 3: Task handoff
 
-Status: implemented via `npm run lead:task`. The chosen internal task destination is `tasks/lead-followups.jsonl`, a repo-local JSONL queue ignored by git to avoid committing lead data.
+Status: implemented via `npm run lead:task` and `npm run lead:tasks`. The chosen internal task destination is `tasks/lead-followups.jsonl`, a repo-local JSONL queue ignored by git to avoid committing lead data.
 
 - Create an internal follow-up item in the chosen task system or daily brief queue.
 - Include due date, lead context, and next action.
@@ -133,4 +133,4 @@ Status: implemented with `demo/sanitized-lead.txt` and `demo/voice-agent-demo-ru
 
 ## Recommended next action
 
-Next implementation step: add a `lead:tasks` review command to list open internal follow-up items, surface overdue/high-priority leads, and optionally mark items handled after Kris approval.
+Next implementation step: wire open lead follow-up tasks into the daily brief, especially overdue/high-priority items. `npm run lead:tasks` now lists the local queue and can mark tasks handled internally.

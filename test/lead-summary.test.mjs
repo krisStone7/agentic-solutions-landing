@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { appendFollowUpTask, buildFollowUpTask, buildSummary } from '../scripts/lead-summary.mjs';
+import { appendFollowUpTask, buildFollowUpTask, buildSummary, listFollowUpTasks, markTaskHandled } from '../scripts/lead-summary.mjs';
 
 test('parses synthetic E2E intake into Phase 1 summary fields', () => {
   const text = readFileSync('test/fixtures/e2e-intake.txt', 'utf8');
@@ -98,4 +98,64 @@ test('creates an internal Phase 3 follow-up task in a local JSONL queue', () => 
   assert.equal(second.created, false);
   assert.equal(lines.length, 1);
   assert.equal(JSON.parse(lines[0]).id, task.id);
+});
+
+test('lists open internal follow-up tasks with overdue status', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'lead-task-list-'));
+  const taskFile = join(dir, 'lead-followups.jsonl');
+  const openTask = {
+    id: 'lead-open',
+    status: 'open',
+    priority: 'high',
+    dueDate: '2026-05-20',
+    createdAt: '2026-05-19T00:00:00.000Z',
+    title: 'Follow up with Northstar',
+    lead: { company: 'Northstar Field Services', email: 'morgan@example.com' },
+    nextAction: 'Schedule discovery.',
+  };
+  const handledTask = {
+    id: 'lead-handled',
+    status: 'handled',
+    priority: 'low',
+    dueDate: '2026-05-18',
+    createdAt: '2026-05-18T00:00:00.000Z',
+    title: 'Handled task',
+  };
+  appendFollowUpTask(openTask, taskFile);
+  appendFollowUpTask(handledTask, taskFile);
+
+  const result = listFollowUpTasks(taskFile, { now: '2026-05-24T12:00:00.000Z' });
+
+  assert.equal(result.total, 2);
+  assert.equal(result.open, 1);
+  assert.equal(result.overdue, 1);
+  assert.equal(result.shown, 1);
+  assert.equal(result.tasks[0].id, 'lead-open');
+  assert.equal(result.tasks[0].overdue, true);
+});
+
+test('marks an internal follow-up task handled without external action', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'lead-task-handle-'));
+  const taskFile = join(dir, 'lead-followups.jsonl');
+  const task = {
+    id: 'lead-handle-me',
+    status: 'open',
+    priority: 'medium',
+    dueDate: '2026-05-25',
+    title: 'Follow up with Acme',
+  };
+  appendFollowUpTask(task, taskFile);
+
+  const result = markTaskHandled(taskFile, 'lead-handle-me', {
+    now: '2026-05-26T12:00:00.000Z',
+    note: 'Kris handled manually.',
+  });
+  const list = listFollowUpTasks(taskFile, { now: '2026-05-26T12:00:00.000Z', all: true });
+
+  assert.equal(result.changed, true);
+  assert.equal(result.task.status, 'handled');
+  assert.equal(result.task.handledNote, 'Kris handled manually.');
+  assert.equal(result.task.externalActionPerformed, false);
+  assert.equal(list.open, 0);
+  assert.equal(list.tasks[0].status, 'handled');
 });
