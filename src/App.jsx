@@ -165,7 +165,307 @@ const audiences = [
   'Consultancies adding repeatable agent capabilities for clients',
 ];
 
-function App() {
+const intakeWorkflowSteps = [
+  'Inbound call, form, or email',
+  'AI intake summary',
+  'Fit and urgency score',
+  'Staged reply or task',
+  'Human approval',
+  'CRM, scheduling, or follow-up',
+];
+
+const problemBullets = [
+  'Missed calls and slow replies cost revenue.',
+  'Shared inboxes bury useful context.',
+  'Staff manually copy details into CRMs and spreadsheets.',
+  'Follow-up quality varies by person and workload.',
+  'Owners lack a consistent view of lead urgency and next action.',
+];
+
+const demoProofPoints = [
+  ['Fit', 'High'],
+  ['Urgency', 'Medium'],
+  ['Draft reply', 'Staged only'],
+  ['Send action', 'Disabled'],
+  ['Follow-up task', 'Created with due date and priority'],
+  ['Duplicate protection', 'Reruns do not create duplicate tasks'],
+];
+
+const safetyRules = [
+  'No outbound email without approval',
+  'No calendar booking without approval',
+  'No CRM writes unless explicitly enabled',
+  'No pricing promises or technical commitments by the agent',
+  'Escalation for urgent, confidential, legal, safety-critical, or low-confidence cases',
+  'Lead-submitted text treated as untrusted input',
+];
+
+const pilotIncludes = [
+  'One lead source mapped: calls, website forms, or shared inbox',
+  'Structured lead summary schema',
+  'AI receptionist or transcript-based intake path',
+  'Staged follow-up draft',
+  'Internal task or notification queue',
+  'Escalation and approval rules',
+  'Test cases for normal leads, spam, urgent requests, and unsupported claims',
+  'Handoff and training session',
+];
+
+const bestFitCustomers = [
+  'HVAC, electrical, plumbing, commercial maintenance, property services, inspection, and specialty repair firms',
+  'Teams with high inbound call or form volume',
+  'Businesses using shared inboxes, Google Calendar, HubSpot, Jobber, Housecall Pro, Airtable, Sheets, or similar tools',
+  'Owners who want faster response without giving an AI unchecked authority',
+];
+
+const notFirstFitCustomers = [
+  'Healthcare, legal, finance, or regulated intake without a separate compliance review',
+  'Teams that want fully autonomous customer commitments on day one',
+  'Businesses without a clear inbound lead workflow',
+];
+
+function AiReceptionistPage() {
+  return (
+    <div className="page-shell landing-page">
+      <header className="topbar">
+        <a className="brand" href="/">
+          <span className="brand-mark" aria-hidden="true">
+            SAI
+          </span>
+          <span>Stonebridge AI</span>
+        </a>
+        <nav className="nav landing-nav">
+          <a href="#workflow">Workflow</a>
+          <a href="#demo-workflow">Demo</a>
+          <a href="#pilot">Pilot Offer</a>
+          <a href="/#intake">Intake Form</a>
+        </nav>
+      </header>
+
+      <main id="top">
+        <section className="hero section landing-hero">
+          <div className="hero-copy">
+            <p className="eyebrow">AI Receptionist Pilot</p>
+            <h1>AI receptionist and lead qualification system in 7 days</h1>
+            <p className="lead">
+              Capture more inbound calls, forms, and emails, then turn each request into a structured summary,
+              urgency score, staged follow-up, and internal next step. Nothing sends, books, or updates customer
+              systems without approval.
+            </p>
+            <div className="hero-actions">
+              <a className="button button-primary" href="/#intake">
+                Book a 30-minute intake review
+              </a>
+              <a className="button button-secondary" href="#demo-workflow">
+                See the 2-minute demo workflow
+              </a>
+            </div>
+            <p className="safety-line">
+              Approval-gated by design: human approval stays in front of outbound messages, scheduling, CRM updates,
+              pricing, and customer commitments.
+            </p>
+          </div>
+
+          <aside className="hero-panel receptionist-panel">
+            <p className="panel-label">Pilot snapshot</p>
+            <ul className="metric-list">
+              <li>
+                <strong>7 days</strong>
+                <span>to map one intake path and launch the first controlled workflow</span>
+              </li>
+              <li>
+                <strong>Minutes</strong>
+                <span>to summarize, score, and assign qualified inbound requests</span>
+              </li>
+              <li>
+                <strong>Approval-gated</strong>
+                <span>so drafts, bookings, writes, and commitments stay under human control</span>
+              </li>
+            </ul>
+          </aside>
+        </section>
+
+        <section className="section split-panel" id="problem">
+          <div className="section-heading narrow">
+            <p className="eyebrow">The Problem</p>
+            <h2>Leads get lost between tools, not because teams do not care.</h2>
+          </div>
+          <div className="proof-card">
+            <p>
+              Service teams do not usually lose leads because they lack effort. They lose leads in the handoff between
+              call, inbox, CRM, scheduler, and follow-up.
+            </p>
+            <ul className="check-list">
+              {problemBullets.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="section" id="workflow">
+          <div className="section-heading wide">
+            <p className="eyebrow">Workflow Diagram</p>
+            <h2>From inbound request to approved next step.</h2>
+            <p className="section-intro">
+              The system automates intake, triage, drafting, and task handoff. It does not autonomously make
+              commitments to customers.
+            </p>
+          </div>
+          <ol className="workflow-strip" aria-label="AI receptionist workflow">
+            {intakeWorkflowSteps.map((step, index) => (
+              <li key={step}>
+                <span>0{index + 1}</span>
+                <strong>{step}</strong>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="section demo-section" id="demo-workflow">
+          <div className="section-heading wide">
+            <p className="eyebrow">Sanitized Demo Example</p>
+            <h2>A field-services intake example with safe boundaries.</h2>
+            <p className="section-intro">
+              A regional maintenance company receives a request for help automating website intake, email triage, CRM
+              updates, and scheduling handoff. The system extracts the contact, tools, bottleneck, budget range,
+              timeline, sensitive-data notes, fit score, urgency score, missing information, and recommended next
+              action. It then stages a follow-up draft and creates an internal task.
+            </p>
+          </div>
+          <div className="demo-grid">
+            <article className="screenshot-card">
+              <p className="panel-label">Lead summary</p>
+              <dl>
+                {demoProofPoints.slice(0, 3).map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+            <article className="screenshot-card accent-panel">
+              <p className="panel-label">Staged draft</p>
+              <p>
+                Thanks for sharing the workflow. I captured website intake, inbox triage, CRM update, and scheduling
+                handoff as the first path to review.
+              </p>
+              <span className="status-pill">Send action: disabled</span>
+            </article>
+            <article className="screenshot-card">
+              <p className="panel-label">Internal task</p>
+              <dl>
+                {demoProofPoints.slice(4).map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          </div>
+        </section>
+
+        <section className="section safety-section" id="safety">
+          <div className="safety-card">
+            <div className="section-heading wide">
+              <p className="eyebrow">Safety And Control</p>
+              <h2>Automation where it helps, approval where it matters.</h2>
+            </div>
+            <div className="safety-badge">Approval-gated automation</div>
+            <ul className="check-list two-column-list">
+              {safetyRules.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <section className="section pilot-section" id="pilot">
+          <div className="section-heading wide">
+            <p className="eyebrow">Pilot Offer</p>
+            <h2>7-Day AI Intake Pilot</h2>
+            <p className="section-intro">
+              Every qualified inbound request gets summarized, scored, and assigned a next step within minutes during
+              the agreed operating window.
+            </p>
+          </div>
+          <div className="pilot-layout">
+            <article className="proof-card">
+              <h3>Includes</h3>
+              <ul className="check-list">
+                {pilotIncludes.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article className="pricing-card">
+              <h3>Pricing frame</h3>
+              <ul className="metric-list">
+                <li>
+                  <strong>$750</strong>
+                  <span>Workflow diagnostic</span>
+                </li>
+                <li>
+                  <strong>$3,000 to $7,500</strong>
+                  <span>Pilot build</span>
+                </li>
+                <li>
+                  <strong>$500 to $2,000 per month</strong>
+                  <span>Ongoing monitoring and improvement</span>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="section fit-section" id="fit">
+          <div className="section-heading wide">
+            <p className="eyebrow">Best Fit</p>
+            <h2>Built for service businesses with real intake volume.</h2>
+          </div>
+          <div className="comparison-grid">
+            <article className="comparison-column accent-panel">
+              <h3>Best-fit customers</h3>
+              <ul>
+                {bestFitCustomers.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article className="comparison-column muted-panel">
+              <h3>Not first fit</h3>
+              <ul>
+                {notFirstFitCustomers.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section className="section cta-section" id="final-cta">
+          <div className="cta-card landing-cta">
+            <p className="eyebrow">Next Step</p>
+            <h2>Want to find the highest-friction lead handoff in your business?</h2>
+            <p>
+              Book a 30-minute intake review. We will map one lead path, identify the manual handoffs, and show where
+              approval-gated AI can safely reduce response time.
+            </p>
+            <a className="button button-primary" href="/#intake">
+              Book intake review
+            </a>
+            <p className="microcopy">No obligation. Bring one real workflow. We will keep the first scope narrow.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+
+function HomePage() {
   const [intakeForm, setIntakeForm] = useState(initialIntakeForm);
   const [formStatus, setFormStatus] = useState({ state: 'idle', message: '' });
 
@@ -704,6 +1004,16 @@ ${intakeForm.notes}`,
       </main>
     </div>
   );
+}
+
+function App() {
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
+
+  if (path === '/ai-receptionist-lead-qualification') {
+    return <AiReceptionistPage />;
+  }
+
+  return <HomePage />;
 }
 
 export default App;
