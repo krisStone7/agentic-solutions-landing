@@ -1,7 +1,7 @@
 # Stonebridge AI Voice Agent MVP
 
 Date: 2026-05-23
-Status: Phase 1-3 internal MVP implemented
+Status: Phase 1-4 internal MVP implemented
 
 ## Goal
 
@@ -119,6 +119,8 @@ Validation:
 
 ### Phase 4: Demo packaging
 
+Status: implemented with `demo/sanitized-lead.txt` and `demo/voice-agent-demo-runbook.md`.
+
 - Create a sanitized demo lead.
 - Show form submission -> inbox -> agent summary -> voice readout -> staged follow-up.
 - Record or document the workflow for Stonebridge AI sales material.
@@ -131,4 +133,4 @@ Validation:
 
 ## Recommended next action
 
-Implement Phase 1 as an internal read-only lead-summary command, then test it against the existing synthetic E2E lead before connecting any outbound action.
+Next implementation step: add a `lead:tasks` review command to list open internal follow-up items, surface overdue/high-priority leads, and optionally mark items handled after Kris approval.

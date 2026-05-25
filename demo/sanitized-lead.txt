@@ -1,0 +1,28 @@
+New AI Integration Readiness Intake
+
+Name: Morgan Taylor
+Email: morgan.taylor@example.com
+Company: Northstar Field Services
+Website: https://northstar-field.example
+
+What the company does:
+Regional field-services company coordinating maintenance visits for commercial facilities.
+
+Workflow to improve:
+Automate website intake, email triage, CRM updates, and scheduling handoff for new service requests.
+
+Tools:
+Shared email inbox, Google Calendar, HubSpot, Google Sheets
+
+Where work gets stuck:
+Coordinators manually copy request details from email into HubSpot, check technician availability, and send follow-up questions before scheduling.
+
+Sensitive data or access concerns:
+Customer contact details and service addresses. No payment, health, or regulated data in the first pilot.
+
+Interest: Ready for a small pilot
+Budget: $3k-$5k pilot range
+Timeline: This month
+
+Anything else:
+Success means every qualified web request is summarized, logged in HubSpot, and assigned a next step within 10 minutes during business hours.
