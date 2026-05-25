@@ -66,7 +66,7 @@ Expected talking points:
 - Re-running the command is idempotent and reports the same task as already queued.
 
 
-### 5. Review open internal follow-up tasks
+### 4. Review open internal follow-up tasks
 
 ```bash
 npm run lead:tasks -- --task-file tmp/demo-lead-followups.jsonl
@@ -78,7 +78,7 @@ Expected talking points:
 - Overdue tasks are flagged.
 - The list shows the next action and confirms external action is disabled.
 
-### 6. Mark a demo task handled
+### 5. Mark a demo task handled
 
 Use the task id shown by `lead:task` or `lead:tasks`:
 
@@ -88,7 +88,7 @@ npm run lead:tasks -- --task-file tmp/demo-lead-followups.jsonl --mark-handled l
 
 Expected talking point: marking handled updates only the local queue. It does not send email, create calendar events, or touch CRM.
 
-### 7. Optional live inbox proof
+### 6. Optional live inbox proof
 
 Only if Kris wants to show the live integration path:
 
@@ -109,6 +109,40 @@ Expected talking point: live AgentMail access is read-only for this workflow.
 - Creates consistent lead qualification output.
 - Preserves human approval for outbound communication.
 - Produces a reusable client-facing pattern: intake, triage, draft, task handoff, approval.
+
+
+## Retell inbound-call webhook proof
+
+The inbound-call webhook implementation lives at `functions/api/retell-webhook.js`. It posts completed/analyzed Retell call summaries into the approved Discord channel once `DISCORD_WEBHOOK_URL` is configured in the deployment environment.
+
+Local proof without contacting Discord:
+
+```bash
+npm test
+```
+
+Create an internal follow-up queue record from the sanitized Retell fixture:
+
+```bash
+npm run call:task -- --file test/fixtures/retell-completed-call.json --task-file tmp/demo-voice-call-followups.jsonl
+npm run call:tasks -- --task-file tmp/demo-voice-call-followups.jsonl
+```
+
+Expected talking points:
+
+- Required call fields are normalized before posting.
+- Discord mentions are disabled in webhook payloads.
+- Lead/high-urgency calls become internal queue records only.
+- Test/QA/synthetic calls are archived as QA evidence.
+- External action remains disabled until Kris approves it.
+
+Live Retell test call checklist:
+
+1. Add `DISCORD_WEBHOOK_URL` as a secret environment variable for the deployed Pages project.
+2. Configure the Retell agent webhook URL to `https://stonebridgebai.com/api/retell-webhook`.
+3. Place one test call and wait for Retell's completed/analyzed event.
+4. Verify the Discord post contains caller, company, contact, intent, urgency, summary, recommended next action, escalation flag, confidence, call ID, and transcript.
+5. If it is a real lead/high-urgency call, run the local queue helper against the captured payload or create the internal follow-up task manually. Do not contact the lead without approval.
 
 ## Cleanup
 

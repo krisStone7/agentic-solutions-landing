@@ -1,0 +1,22 @@
+{
+  "event": "call_analyzed",
+  "call": {
+    "call_id": "retell-call-001",
+    "from_number": "+13105550123",
+    "call_status": "ended",
+    "transcript": "Agent: Hi, this is Stonebridge AI's virtual receptionist.\nCaller: I need help with missed calls and lead follow-up.",
+    "call_analysis": {
+      "call_summary": "Caller wants an AI receptionist to capture missed calls and qualify leads.",
+      "custom_analysis_data": {
+        "caller_name": "Morgan Rivera",
+        "company": "Example Co",
+        "email": "test@example.com",
+        "intent": "lead",
+        "urgency": "normal",
+        "recommended_next_action": "schedule consult",
+        "escalation_required": false,
+        "confidence": 0.86
+      }
+    }
+  }
+}

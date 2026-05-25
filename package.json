@@ -11,7 +11,10 @@
     "test:lead-summary": "node --test test/lead-summary.test.mjs",
     "lead:draft": "node scripts/lead-summary.mjs --include-draft",
     "lead:task": "node scripts/lead-summary.mjs --create-task",
-    "lead:tasks": "node scripts/lead-summary.mjs --list-tasks"
+    "lead:tasks": "node scripts/lead-summary.mjs --list-tasks",
+    "test": "node --test test/*.test.mjs",
+    "call:task": "node scripts/retell-call-followup.mjs",
+    "call:tasks": "node scripts/retell-call-followup.mjs --list"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -125,6 +125,42 @@ Status: implemented with `demo/sanitized-lead.txt` and `demo/voice-agent-demo-ru
 - Show form submission -> inbox -> agent summary -> voice readout -> staged follow-up.
 - Record or document the workflow for Stonebridge AI sales material.
 
+
+## Retell inbound call webhook
+
+Status: implemented locally, deployment secret still required before live Retell posting.
+
+Endpoint path after deploy:
+
+```text
+POST /api/retell-webhook
+```
+
+Required Cloudflare/Pages environment variable:
+
+- `DISCORD_WEBHOOK_URL`: Discord webhook URL for the approved `#inbound-calls` channel. Keep this secret out of git and logs.
+
+Behavior:
+
+1. Accepts completed/analyzed Retell call payloads.
+2. Normalizes caller, company, contact, intent, urgency, summary, next action, escalation flag, confidence, call ID, and transcript.
+3. Posts a concise call summary to Discord with mentions disabled.
+4. Applies a simple follow-up queue rule:
+   - lead intent or high urgency: `queue_follow_up`
+   - obvious test/QA/synthetic calls: `archive_qa`
+   - normal calls: `review_only`
+5. No email, calendar, CRM, or outbound contact action is performed.
+
+Local validation:
+
+```bash
+npm test
+npm run call:task -- --file test/fixtures/retell-completed-call.json --task-file tmp/demo-voice-call-followups.jsonl
+npm run call:tasks -- --task-file tmp/demo-voice-call-followups.jsonl
+```
+
+Live end-to-end validation is blocked until `DISCORD_WEBHOOK_URL` is configured and a Retell agent webhook is pointed at the deployed endpoint.
+
 ## Open questions
 
 - Which voice input path should be the first target: Discord voice workflow, Wispr Flow dictated commands, or another local voice pipeline?
