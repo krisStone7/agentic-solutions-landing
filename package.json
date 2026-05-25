@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lead:summary": "node scripts/lead-summary.mjs",
+    "test:lead-summary": "node --test test/lead-summary.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

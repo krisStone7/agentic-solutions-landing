@@ -1,0 +1,28 @@
+New AI Integration Readiness Intake
+
+Name: Volt E2E Test
+Email: volt-e2e-test@example.com
+Company: Stonebridge AI Test E2E-20260523T080527Z
+Website: https://stonebridgebai.com
+
+What the company does:
+End-to-end verification test for the live Stonebridge AI intake form.
+
+Workflow to improve:
+Verify live Cloudflare Pages form submission reaches AgentMail inbox.
+
+Tools:
+Other, OpenClaw curl test
+
+Where work gets stuck:
+No customer issue, this is a synthetic QA submission.
+
+Sensitive data or access concerns:
+None, synthetic test only.
+
+Interest: Testing the intake workflow
+Budget: N/A
+Timeline: Immediate
+
+Anything else:
+Synthetic end-to-end test marker E2E-20260523T080527Z.
