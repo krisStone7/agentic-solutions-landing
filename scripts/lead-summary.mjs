@@ -5,12 +5,15 @@
  * Fetches AgentMail messages labeled `website-intake`, parses the latest intake,
  * and prints the Phase 1 summary format. No outbound actions are performed.
  */
-import { readFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const BASE_URL = 'https://api.agentmail.to/v0';
 const DEFAULT_INBOX = 'stonebridgeai@agentmail.to';
 const DEFAULT_LABEL = 'website-intake';
+const DEFAULT_TASK_FILE = 'tasks/lead-followups.jsonl';
 
 function parseArgs(argv) {
   const args = {
@@ -21,6 +24,9 @@ function parseArgs(argv) {
     file: '',
     messageId: '',
     includeDraft: false,
+    createTask: false,
+    taskFile: DEFAULT_TASK_FILE,
+    now: '',
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -33,6 +39,9 @@ function parseArgs(argv) {
     else if (arg === '--file') args.file = next();
     else if (arg === '--message-id') args.messageId = next();
     else if (arg === '--include-draft') args.includeDraft = true;
+    else if (arg === '--create-task') args.createTask = true;
+    else if (arg === '--task-file') args.taskFile = next();
+    else if (arg === '--now') args.now = next();
     else if (arg === '--help' || arg === '-h') args.help = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -45,6 +54,7 @@ function usage() {
   npm run lead:summary -- --message-id <agentmail-message-id>
   npm run lead:summary -- --file test/fixtures/e2e-intake.txt
   npm run lead:draft
+  npm run lead:task
 
 Options:
   --inbox <email>        AgentMail inbox, default ${DEFAULT_INBOX}
@@ -54,6 +64,9 @@ Options:
   --file <path>          Parse a local intake text file, useful for tests
   --format markdown|json Output format, default markdown
   --include-draft      Generate a staged follow-up draft. Never sends.
+  --create-task        Append an internal follow-up item to a local JSONL queue.
+  --task-file <path>   Task queue file, default ${DEFAULT_TASK_FILE}
+  --now <iso-date>     Override current time for deterministic tests.
 
 Environment:
   AGENTMAIL_API_KEY is required unless --file is used.
@@ -367,10 +380,128 @@ function buildDraftReply(summary) {
 }
 
 
-function renderMarkdown(summary) {
+
+function parseDate(value) {
+  const date = value ? new Date(value) : new Date();
+  if (Number.isNaN(date.getTime())) throw new Error(`Invalid date: ${value}`);
+  return date;
+}
+
+function addDays(date, days) {
+  const copy = new Date(date.getTime());
+  copy.setUTCDate(copy.getUTCDate() + days);
+  return copy;
+}
+
+function isoDate(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function taskPriority(summary) {
+  if (summary.promptInjectionRisk === 'flagged') return 'high';
+  if (summary.fitScore === 'high' && summary.urgencyScore === 'high') return 'high';
+  if (summary.fitScore === 'high' || summary.urgencyScore === 'high') return 'medium';
+  if (summary.fitScore === 'medium') return 'medium';
+  return 'low';
+}
+
+function dueOffsetDays(priority) {
+  if (priority === 'high') return 1;
+  if (priority === 'medium') return 3;
+  return 7;
+}
+
+function stableTaskId(summary) {
+  const seed = `${summary.messageId}|${summary.companyAndContact.company}|${summary.recommendedNextAction}`;
+  return `lead-${createHash('sha256').update(seed).digest('hex').slice(0, 12)}`;
+}
+
+function taskTitle(summary) {
+  const company = compactLine(summary.companyAndContact.company);
+  if (summary.promptInjectionRisk === 'flagged') return `Manual review required for ${company} lead`;
+  if (summary.fitScore === 'low') return `Review low-fit or QA lead: ${company}`;
+  return `Follow up with ${company} about AI workflow automation`;
+}
+
+function buildFollowUpTask(summary, options = {}) {
+  const now = parseDate(options.now);
+  const priority = taskPriority(summary);
+  const dueDate = isoDate(addDays(now, dueOffsetDays(priority)));
+  const draft = typeof summary.draftReply === 'object' ? summary.draftReply : null;
+  return {
+    id: stableTaskId(summary),
+    type: 'stonebridge-ai-lead-followup',
+    status: 'open',
+    createdAt: now.toISOString(),
+    dueDate,
+    priority,
+    title: taskTitle(summary),
+    source: summary.source,
+    messageId: summary.messageId,
+    lead: summary.companyAndContact,
+    fitScore: summary.fitScore,
+    urgencyScore: summary.urgencyScore,
+    promptInjectionRisk: summary.promptInjectionRisk,
+    nextAction: summary.recommendedNextAction,
+    missingInformation: summary.missingInformation,
+    draftReply: draft ? {
+      status: draft.status,
+      subject: draft.subject || null,
+      body: draft.body || null,
+      approvalRequired: true,
+      sendAction: false,
+      note: draft.note || draft.reason || 'Draft/task is internal only. No external send action was created.',
+    } : null,
+    approvalRequiredBeforeExternalAction: true,
+    destination: 'repo-local-jsonl-queue',
+  };
+}
+
+function readExistingTaskIds(taskFile) {
+  if (!existsSync(taskFile)) return new Set();
+  const ids = new Set();
+  for (const line of readFileSync(taskFile, 'utf8').split('\n')) {
+    if (!line.trim()) continue;
+    try {
+      const item = JSON.parse(line);
+      if (item?.id) ids.add(item.id);
+    } catch {
+      // Ignore malformed historical queue lines instead of blocking new task creation.
+    }
+  }
+  return ids;
+}
+
+function appendFollowUpTask(task, taskFile) {
+  mkdirSync(dirname(taskFile), { recursive: true });
+  const ids = readExistingTaskIds(taskFile);
+  if (ids.has(task.id)) return { created: false, taskFile, task };
+  appendFileSync(taskFile, `${JSON.stringify(task)}\n`, 'utf8');
+  return { created: true, taskFile, task };
+}
+
+function renderTaskMarkdown(taskResult) {
+  const verb = taskResult.created ? 'created' : 'already queued';
+  const task = taskResult.task;
+  return [
+    '',
+    '# Internal Follow-up Task',
+    '',
+    `Task ${verb}: ${task.id}`,
+    `Queue file: ${taskResult.taskFile}`,
+    `Title: ${task.title}`,
+    `Due: ${task.dueDate}`,
+    `Priority: ${task.priority}`,
+    `Next action: ${task.nextAction}`,
+    `External action enabled: no`,
+    `Approval required before external action: yes`,
+  ].join('\n');
+}
+
+function renderMarkdown(summary, taskResult = null) {
   const c = summary.companyAndContact;
   const ibt = summary.interestBudgetTimeline;
-  return [
+  const lines = [
     '# Stonebridge AI Lead Summary',
     '',
     `Source: ${summary.source}`,
@@ -410,10 +541,20 @@ function renderMarkdown(summary) {
           '',
           `Send action: ${summary.draftReply.sendAction ? 'enabled' : 'disabled'}`,
         ].join('\n'),
-  ].join('\n');
+  ];
+
+  if (taskResult) lines.push(renderTaskMarkdown(taskResult));
+  return lines.join('\n');
 }
 
-export { parseIntake, buildSummary, renderMarkdown, buildDraftReply };
+export {
+  parseIntake,
+  buildSummary,
+  renderMarkdown,
+  buildDraftReply,
+  buildFollowUpTask,
+  appendFollowUpTask,
+};
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -422,9 +563,13 @@ async function main() {
     return;
   }
   const { source, message } = await loadLead(args);
-  const summary = buildSummary(message, source, { includeDraft: args.includeDraft });
-  if (args.format === 'json') console.log(JSON.stringify(summary, null, 2));
-  else if (args.format === 'markdown') console.log(renderMarkdown(summary));
+  const includeDraft = args.includeDraft || args.createTask;
+  const summary = buildSummary(message, source, { includeDraft });
+  const taskResult = args.createTask
+    ? appendFollowUpTask(buildFollowUpTask(summary, { now: args.now }), args.taskFile)
+    : null;
+  if (args.format === 'json') console.log(JSON.stringify(taskResult ? { summary, taskResult } : summary, null, 2));
+  else if (args.format === 'markdown') console.log(renderMarkdown(summary, taskResult));
   else throw new Error(`Unsupported format: ${args.format}`);
 }
 

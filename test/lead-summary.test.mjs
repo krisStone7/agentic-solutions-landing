@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { buildSummary } from '../scripts/lead-summary.mjs';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { appendFollowUpTask, buildFollowUpTask, buildSummary } from '../scripts/lead-summary.mjs';
 
 test('parses synthetic E2E intake into Phase 1 summary fields', () => {
   const text = readFileSync('test/fixtures/e2e-intake.txt', 'utf8');
@@ -66,4 +68,34 @@ test('does not generate an email body when prompt-injection text is flagged', ()
   assert.equal(summary.draftReply.status, 'blocked');
   assert.equal(summary.draftReply.sendAction, false);
   assert.match(summary.draftReply.reason, /Prompt-injection/);
+});
+
+
+test('creates an internal Phase 3 follow-up task in a local JSONL queue', () => {
+  const text = readFileSync('test/fixtures/high-fit-intake.txt', 'utf8');
+  const summary = buildSummary({
+    message_id: 'fixture-high-fit',
+    subject: 'Stonebridge AI intake: Acme Field Services',
+    labels: ['website-intake'],
+    text,
+  }, 'fixture', { includeDraft: true });
+
+  const task = buildFollowUpTask(summary, { now: '2026-05-24T12:00:00.000Z' });
+  assert.equal(task.type, 'stonebridge-ai-lead-followup');
+  assert.equal(task.status, 'open');
+  assert.equal(task.priority, 'medium');
+  assert.equal(task.dueDate, '2026-05-27');
+  assert.equal(task.approvalRequiredBeforeExternalAction, true);
+  assert.equal(task.draftReply.sendAction, false);
+
+  const dir = mkdtempSync(join(tmpdir(), 'lead-task-'));
+  const taskFile = join(dir, 'lead-followups.jsonl');
+  const first = appendFollowUpTask(task, taskFile);
+  const second = appendFollowUpTask(task, taskFile);
+  const lines = readFileSync(taskFile, 'utf8').trim().split('\n');
+
+  assert.equal(first.created, true);
+  assert.equal(second.created, false);
+  assert.equal(lines.length, 1);
+  assert.equal(JSON.parse(lines[0]).id, task.id);
 });

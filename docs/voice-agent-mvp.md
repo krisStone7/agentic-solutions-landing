@@ -1,7 +1,7 @@
 # Stonebridge AI Voice Agent MVP
 
 Date: 2026-05-23
-Status: Draft for Kris review
+Status: Phase 1-3 internal MVP implemented
 
 ## Goal
 
@@ -79,6 +79,8 @@ Voice input
 
 ### Phase 1: Manual readout
 
+Status: implemented via `npm run lead:summary`.
+
 - Add a script or command that fetches new AgentMail messages labeled `website-intake`.
 - Parse the latest lead into the standard summary format.
 - Return summary in Discord or voice session.
@@ -92,6 +94,8 @@ Validation:
 
 ### Phase 2: Draft follow-up
 
+Status: implemented via `npm run lead:draft`. Drafts are staged only and never sent.
+
 - Generate a concise follow-up email from the lead summary.
 - Keep it staged for Kris approval.
 - Include suggested subject and body.
@@ -102,6 +106,8 @@ Validation:
 - Confirm no send occurs without approval.
 
 ### Phase 3: Task handoff
+
+Status: implemented via `npm run lead:task`. The chosen internal task destination is `tasks/lead-followups.jsonl`, a repo-local JSONL queue ignored by git to avoid committing lead data.
 
 - Create an internal follow-up item in the chosen task system or daily brief queue.
 - Include due date, lead context, and next action.
@@ -120,7 +126,7 @@ Validation:
 ## Open questions
 
 - Which voice input path should be the first target: Discord voice workflow, Wispr Flow dictated commands, or another local voice pipeline?
-- Where should follow-up tasks live: Discord daily brief, a repo file, calendar, CRM, or a lightweight task board?
+- Where should follow-up tasks live long term: current MVP uses a repo-local JSONL queue. Future options are Discord daily brief, calendar, CRM, or a lightweight task board.
 - Should the test AgentMail message stay as QA evidence or be manually archived in the AgentMail console?
 
 ## Recommended next action
