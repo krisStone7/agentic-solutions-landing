@@ -38,8 +38,8 @@ DISCORD_WEBHOOK_URL=<Discord webhook URL for #inbound-calls>
 
 Security requirements:
 
-- Keep the webhook URL out of repository files, Discord chat, logs, screenshots, and test fixtures.
-- Rotate it immediately if exposed.
+- Keep the webhook URL and bot token out of repository files, Discord chat, logs, screenshots, and test fixtures.
+- Rotate any secret immediately if exposed.
 - The webhook code sends `allowed_mentions: { parse: [] }` to avoid accidental pings.
 
 ## Pre-deploy validation
@@ -127,7 +127,7 @@ Go live only if:
 
 - Tests pass
 - Build passes
-- `DISCORD_WEBHOOK_URL` is configured as a secret
+- Discord delivery is configured as either `DISCORD_WEBHOOK_URL`, or `DISCORD_BOT_TOKEN` plus `DISCORD_CHANNEL_ID`
 - Retell points to the correct endpoint
 - One real test call posts correctly to Discord
 - Follow-up tasks remain internal and approval-gated

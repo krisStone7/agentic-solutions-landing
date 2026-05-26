@@ -136,9 +136,14 @@ Endpoint path after deploy:
 POST /api/retell-webhook
 ```
 
-Required Cloudflare/Pages environment variable:
+Preferred Cloudflare/Pages environment variable:
 
 - `DISCORD_WEBHOOK_URL`: Discord webhook URL for the approved `#inbound-calls` channel. Keep this secret out of git and logs.
+
+Fallback if Discord webhook management is unavailable:
+
+- `DISCORD_BOT_TOKEN`: Discord bot token, stored as a secret.
+- `DISCORD_CHANNEL_ID`: approved Discord channel id, `1506162416923185203`.
 
 Behavior:
 
@@ -159,7 +164,7 @@ npm run call:task -- --file test/fixtures/retell-completed-call.json --task-file
 npm run call:tasks -- --task-file tmp/demo-voice-call-followups.jsonl
 ```
 
-Live end-to-end validation is blocked until `DISCORD_WEBHOOK_URL` is configured and a Retell agent webhook is pointed at the deployed endpoint.
+Live end-to-end validation is blocked until Discord delivery is configured and a Retell agent webhook is pointed at the deployed endpoint.
 
 ## Open questions
 

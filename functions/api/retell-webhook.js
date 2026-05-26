@@ -127,7 +127,7 @@ function followUpDecision(summary) {
   };
 }
 
-async function postToDiscord(webhookUrl, content, fetchImpl = fetch) {
+async function postToDiscordWebhook(webhookUrl, content, fetchImpl = fetch) {
   const response = await fetchImpl(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -137,6 +137,33 @@ async function postToDiscord(webhookUrl, content, fetchImpl = fetch) {
     const detail = await response.text().catch(() => '');
     throw new Error(`Discord webhook HTTP ${response.status}: ${detail.slice(0, 500)}`);
   }
+}
+
+async function postToDiscordBot({ botToken, channelId, content, fetchImpl = fetch }) {
+  const response = await fetchImpl(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bot ${botToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(`Discord bot HTTP ${response.status}: ${detail.slice(0, 500)}`);
+  }
+}
+
+async function postToDiscord(env, content, fetchImpl = fetch) {
+  if (env.DISCORD_WEBHOOK_URL) {
+    await postToDiscordWebhook(env.DISCORD_WEBHOOK_URL, content, fetchImpl);
+    return 'webhook';
+  }
+  if (env.DISCORD_BOT_TOKEN && env.DISCORD_CHANNEL_ID) {
+    await postToDiscordBot({ botToken: env.DISCORD_BOT_TOKEN, channelId: env.DISCORD_CHANNEL_ID, content, fetchImpl });
+    return 'bot';
+  }
+  throw new Error('Discord destination is not configured. Set DISCORD_WEBHOOK_URL, or DISCORD_BOT_TOKEN plus DISCORD_CHANNEL_ID.');
 }
 
 async function handleRetellWebhook({ request, env, fetchImpl = fetch }) {
@@ -155,16 +182,17 @@ async function handleRetellWebhook({ request, env, fetchImpl = fetch }) {
     return jsonResponse({ ok: true, ignored: true, reason: 'Not a completed/analyzed call event.' });
   }
 
-  if (!env.DISCORD_WEBHOOK_URL) {
-    return jsonResponse({ error: 'DISCORD_WEBHOOK_URL is not configured.' }, 503);
+  const hasDiscordDestination = env.DISCORD_WEBHOOK_URL || (env.DISCORD_BOT_TOKEN && env.DISCORD_CHANNEL_ID);
+  if (!hasDiscordDestination) {
+    return jsonResponse({ error: 'Discord destination is not configured. Set DISCORD_WEBHOOK_URL, or DISCORD_BOT_TOKEN plus DISCORD_CHANNEL_ID.' }, 503);
   }
 
   const summary = normalizeRetellPayload(payload);
   const followUp = followUpDecision(summary);
   const message = `${formatDiscordMessage(summary)}\n- Follow-up queue rule: ${followUp.action} - ${followUp.reason}`;
-  await postToDiscord(env.DISCORD_WEBHOOK_URL, message, fetchImpl);
+  const discordTransport = await postToDiscord(env, message, fetchImpl);
 
-  return jsonResponse({ ok: true, callId: summary.callId, followUp });
+  return jsonResponse({ ok: true, callId: summary.callId, followUp, discordTransport });
 }
 
 export async function onRequestPost(context) {
