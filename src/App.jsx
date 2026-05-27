@@ -921,10 +921,10 @@ function HomePage() {
               </div>
             </div>
 
-            <aside className="founder-card" aria-label="About Kristofer Stone">
+            <aside className="founder-card" aria-label="About Kris Stone">
               <img src="/kris-stone.jpg" alt="Kristofer Stone with a returned spacecraft capsule" />
               <div>
-                <p className="eyebrow">About Kristofer Stone</p>
+                <p className="eyebrow">About Kris Stone</p>
                 <h3>NewSpace operator building practical AI systems.</h3>
                 <p>
                   I have been in the NewSpace startup industry for 7+ years,
