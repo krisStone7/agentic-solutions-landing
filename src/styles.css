@@ -1729,3 +1729,11 @@ h1 {
     padding: 0.95rem;
   }
 }
+
+.contact-note {
+  margin-bottom: 0.15rem;
+}
+
+.contact-location {
+  margin-top: 0;
+}

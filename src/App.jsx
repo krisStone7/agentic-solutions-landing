@@ -905,7 +905,7 @@ function HomePage() {
                 from a clear implementation roadmap.
               </p>
               <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
-              <p className="contact-location">Los Angeles, California</p>
+              <p className="contact-location">Los Angeles, CA</p>
               <div className="contact-actions">
                 <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
                   stonebridgeai@agentmail.to
