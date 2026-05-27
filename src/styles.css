@@ -353,12 +353,58 @@ h3 {
   margin: 1rem 0 1.5rem;
 }
 
+
+.contact-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.78fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.contact-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.founder-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.founder-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+
+.founder-card h3 {
+  margin-bottom: 0.65rem;
+}
+
+.founder-card p {
+  margin: 0;
+}
+
 @media (max-width: 980px) {
   .hero,
   .split-section,
   .split-panel,
   .card-grid,
-  .outcome-grid {
+  .outcome-grid,
+  .contact-card {
     grid-template-columns: 1fr;
   }
 
@@ -409,6 +455,10 @@ h3 {
   }
 
   .button {
+    width: 100%;
+  }
+
+  .contact-actions {
     width: 100%;
   }
 }
@@ -522,6 +572,10 @@ h3 {
   align-items: stretch;
 }
 
+.audit-wide-panel {
+  grid-column: 1 / -1;
+}
+
 .audit-summary,
 .audit-list-panel {
   min-height: 100%;
@@ -564,6 +618,27 @@ h3 {
 .audit-price strong {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 1.25rem;
+}
+
+
+.consultation-note {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border: 1px solid rgba(79, 179, 191, 0.32);
+  border-radius: 1.1rem;
+  background: rgba(79, 179, 191, 0.1);
+}
+
+.consultation-note strong {
+  color: #DDF8FB;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+}
+
+.consultation-note p {
+  margin: 0;
+  color: #C2D1DA;
 }
 
 .audit-list-panel {

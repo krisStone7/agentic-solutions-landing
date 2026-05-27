@@ -1,18 +1,24 @@
 import React, { useState } from 'react';
 
 
-const auditDeliverables = [
-  'Workflow and systems map',
-  'AI opportunity register ranked by value, effort, and risk',
-  'Top 3 recommended initiatives with implementation outlines',
-  'Data, security, and human-approval guardrails',
-  '30/60/90 day implementation roadmap',
+const workflowAuditDeliverables = [
+  'Workflow map showing actors, tools, handoffs, delays, and decision points',
+  'Automation opportunity register ranked by value, effort, risk, and data readiness',
+  'Top 3 AI workflow candidates with recommended agent role, inputs, outputs, and approval gates',
+  'Integration notes for CRM, email, calendar, documents, spreadsheets, and internal systems',
+  '30/60/90 day roadmap with quick wins, pilot scope, and implementation prerequisites',
 ];
 
-const auditBestFor = [
-  'Owners who know AI matters but are not sure where to start',
-  'Teams stuck in email, spreadsheets, CRMs, ticket queues, or manual reporting',
+const workflowAuditBestFor = [
+  'Owners who know AI matters but need a concrete starting workflow',
+  'Teams stuck in email, spreadsheets, CRMs, ticket queues, scheduling, or manual reporting',
   'Operations-heavy businesses that need useful automation, not novelty demos',
+];
+
+const workflowAuditSignals = [
+  'Work waits on one person to triage, copy, approve, or follow up',
+  'Customer context lives across too many tools',
+  'The team has repeatable decisions that still require judgment and escalation',
 ];
 
 
@@ -35,7 +41,7 @@ const toolOptions = [
 ];
 
 const interestOptions = [
-  'AI Integration Readiness Audit',
+  'AI Workflow Audit',
   'Implementation help now',
   'Exploring options',
   'Not sure yet',
@@ -128,19 +134,19 @@ const dayTimeline = [
 
 const services = [
   {
-    title: 'Private AI Infrastructure Setup',
+    title: 'AI Chief of Staff',
     description:
-      'Install and configure secure, repeatable agent workspaces with the right local tooling, project structure, and operating conventions.',
+      'Deploy a practical AI operating layer that captures leads, follows up with customers, and keeps front-office work moving without adding more admin load.',
   },
   {
-    title: 'Agent Workflow Design',
+    title: 'Customer Operations Automation',
     description:
-      'Map high-value business tasks into clear human-plus-agent workflows with scoped responsibilities, guardrails, and handoff points.',
+      'Connect AI receptionist, calendar, CRM, payment, and follow-up workflows so every opportunity has an owner, context, and next step.',
   },
   {
-    title: 'Operational Hardening',
+    title: 'Growth Visibility And Web Operations',
     description:
-      'Improve reliability through environment standards, documentation, memory patterns, review loops, and rollout support for internal teams.',
+      'Maintain website content, track business activity, and turn analytics into clear insight on where the company is growing and where attention is needed.',
   },
 ];
 
@@ -149,13 +155,6 @@ const steps = [
   'Stand up private AI infrastructure with practical defaults for local development and team usage.',
   'Define workflows, prompts, safety rules, and review checkpoints so the system is useful on day one.',
   'Train the team on usage patterns, then refine based on real work rather than abstract demos.',
-];
-
-const outcomes = [
-  'Faster setup for agent-enabled delivery',
-  'More consistent execution across projects',
-  'Clearer guardrails for internal adoption',
-  'Less time lost to tool friction and rework',
 ];
 
 const audiences = [
@@ -509,44 +508,10 @@ function HomePage() {
     } catch (error) {
       setFormStatus({
         state: 'error',
-        message: `${error.message} Opening your email app with this intake as a fallback.`,
+        message: `${error.message} Please try again or contact Stonebridge AI directly.`,
       });
-
-      window.location.href = fallbackHref;
     }
   };
-
-  const fallbackBody = encodeURIComponent(
-    `AI Integration Readiness Intake
-
-Name: ${intakeForm.name}
-Email: ${intakeForm.email}
-Company: ${intakeForm.company}
-Website: ${intakeForm.website}
-
-What the company does:
-${intakeForm.business}
-
-Workflow to improve:
-${intakeForm.workflow}
-
-Tools:
-${[...intakeForm.tools, intakeForm.otherTools].filter(Boolean).join(', ')}
-
-Where work gets stuck:
-${intakeForm.bottlenecks}
-
-Sensitive data/access concerns:
-${intakeForm.sensitiveData}
-
-Interest: ${intakeForm.interest}
-Budget: ${intakeForm.budget}
-Timeline: ${intakeForm.timeline}
-
-Anything else:
-${intakeForm.notes}`,
-  );
-  const fallbackHref = `mailto:stonebridgeai@agentmail.to?subject=AI%20Integration%20Readiness%20Intake&body=${fallbackBody}`;
 
   return (
     <div className="page-shell">
@@ -559,11 +524,10 @@ ${intakeForm.notes}`,
         </a>
         <nav className="nav">
           <a href="#services">Services</a>
-          <a href="#readiness-audit">Readiness Audit</a>
+          <a href="#readiness-audit">Workflow Audit</a>
           <a href="#intake">Intake</a>
           <a href="#ai-workforce">AI Workforce</a>
           <a href="#process">How It Works</a>
-          <a href="#outcomes">Outcomes</a>
           <a href="#contact">Contact</a>
         </nav>
       </header>
@@ -612,12 +576,12 @@ ${intakeForm.notes}`,
           <div className="audit-card">
             <div className="section-heading wide">
               <p className="eyebrow">First Offer</p>
-              <h2>Start with an AI Integration Readiness Audit.</h2>
+              <h2>AI workflow audit for practical automation opportunities.</h2>
               <p className="section-intro">
                 Stop guessing where AI belongs in the business. Stonebridge AI
-                maps your real workflows, identifies high-leverage automation
-                opportunities, and gives you a practical roadmap grounded in
-                your tools, data, and risk profile.
+                traces one or more real workflows end to end, identifies where
+                agents can safely reduce admin load, and turns the findings into
+                a prioritized roadmap grounded in your tools, data, and risk profile.
               </p>
             </div>
 
@@ -626,23 +590,28 @@ ${intakeForm.notes}`,
                 <p>
                   The audit is a focused entry engagement for companies that want
                   practical AI integration but are not ready to commit to a full
-                  build. It separates quick wins from architecture-heavy work and
-                  gives leadership a clear next step.
+                  build. It turns messy operational work into a clear map of
+                  candidate agents, human approval points, required integrations,
+                  and the safest first pilot.
                 </p>
                 <div className="audit-price">
-                  <span>Recommended starting point</span>
-                  <strong>$3,500 fixed-price standard audit</strong>
-                  <p>Creditable toward an approved implementation project.</p>
+                  <span>Audit investment</span>
+                  <strong>$500-$3,500 workflow audit</strong>
+                  <p>Final scope depends on workflow complexity, number of systems involved, and the outcome you want from the audit.</p>
+                </div>
+                <div className="consultation-note">
+                  <strong>First consultation is free.</strong>
+                  <p>We start with a no-cost conversation to confirm whether Stonebridge AI is the right fit before recommending a paid audit.</p>
                 </div>
                 <a className="button button-primary" href="#intake">
-                  Request a Readiness Audit
+                  Request a Workflow Audit
                 </a>
               </div>
 
               <div className="audit-list-panel">
                 <h3>What you get</h3>
                 <ul>
-                  {auditDeliverables.map((item) => (
+                  {workflowAuditDeliverables.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -651,7 +620,16 @@ ${intakeForm.notes}`,
               <div className="audit-list-panel muted-panel">
                 <h3>Best for</h3>
                 <ul>
-                  {auditBestFor.map((item) => (
+                  {workflowAuditBestFor.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="audit-list-panel audit-wide-panel">
+                <h3>Good audit signals</h3>
+                <ul>
+                  {workflowAuditSignals.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -663,7 +641,7 @@ ${intakeForm.notes}`,
         <section className="section" id="services">
           <div className="section-heading">
             <p className="eyebrow">Services</p>
-            <h2>Support built around implementation, not theory.</h2>
+            <h2>An AI Chief of Staff for growing service businesses.</h2>
           </div>
           <div className="card-grid">
             {services.map((service) => (
@@ -768,21 +746,6 @@ ${intakeForm.notes}`,
           </ol>
         </section>
 
-        <section className="section" id="outcomes">
-          <div className="section-heading">
-            <p className="eyebrow">Outcomes</p>
-            <h2>What clients should expect after the setup is complete.</h2>
-          </div>
-          <div className="outcome-grid">
-            {outcomes.map((outcome) => (
-              <div className="outcome-item" key={outcome}>
-                <span className="outcome-dot" aria-hidden="true" />
-                <p>{outcome}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         <section className="section split-panel" id="audience">
           <div className="section-heading narrow">
             <p className="eyebrow">Who It&apos;s For</p>
@@ -804,7 +767,7 @@ ${intakeForm.notes}`,
             <h2>Tell us where AI could help first.</h2>
             <p className="section-intro">
               Share the workflow, tools, constraints, and timeline. Stonebridge AI
-              will use this to recommend the right next step: readiness audit,
+              will use this to recommend the right next step: workflow audit,
               implementation scope, or a quick discovery call.
             </p>
           </div>
@@ -970,12 +933,6 @@ ${intakeForm.notes}`,
               <button className="button button-primary" type="submit" disabled={formStatus.state === 'submitting'}>
                 {formStatus.state === 'submitting' ? 'Sending...' : 'Submit Intake'}
               </button>
-              <a
-                className="button button-secondary"
-                href={fallbackHref}
-              >
-                Email fallback
-              </a>
             </div>
 
             {formStatus.message && (
@@ -985,20 +942,46 @@ ${intakeForm.notes}`,
         </section>
 
         <section className="section cta-section" id="contact">
-          <div className="cta-card">
-            <p className="eyebrow">Call To Action</p>
-            <h2>Start with an AI Integration Readiness Audit.</h2>
-            <p>
-              If you want to see where an AI workforce could save time, capture
-              missed opportunities, or reduce admin load, Stonebridge AI can
-              map the first useful workflow, rank the opportunities, and build
-              from a clear implementation roadmap.
-            </p>
-            <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
-            <p className="contact-location">Los Angeles, California</p>
-            <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
-              stonebridgeai@agentmail.to
-            </a>
+          <div className="cta-card contact-card">
+            <div className="contact-copy">
+              <p className="eyebrow">Contact</p>
+              <h2>Start with an AI workflow audit.</h2>
+              <p>
+                If you want to see where an AI workforce could save time, capture
+                missed opportunities, or reduce admin load, Stonebridge AI can
+                map the first useful workflow, rank the opportunities, and build
+                from a clear implementation roadmap.
+              </p>
+              <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
+              <p className="contact-location">Los Angeles, California</p>
+              <div className="contact-actions">
+                <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
+                  stonebridgeai@agentmail.to
+                </a>
+                <a
+                  className="button button-secondary"
+                  href="https://www.linkedin.com/in/kristofer-stone-40054b89/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base_contact_details%3BEcNpRbD6QBKjVcwwNzKu4w%3D%3D"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Connect on LinkedIn
+                </a>
+              </div>
+            </div>
+
+            <aside className="founder-card" aria-label="About Kristofer Stone">
+              <img src="/kris-stone.jpg" alt="Kristofer Stone with a returned spacecraft capsule" />
+              <div>
+                <p className="eyebrow">About Kristofer Stone</p>
+                <h3>NewSpace operator building practical AI systems.</h3>
+                <p>
+                  I have been in the NewSpace startup industry for 7+ years,
+                  working on complex projects ranging from mission-critical
+                  avionics designs to managing high consequence test programs.
+                  Data handling, security, and execution speed are core to what I do.
+                </p>
+              </div>
+            </aside>
           </div>
         </section>
       </main>
