@@ -157,12 +157,6 @@ const steps = [
   'Train the team on usage patterns, then refine based on real work rather than abstract demos.',
 ];
 
-const audiences = [
-  'Small teams building internal AI operations',
-  'Founders who need an agent workflow that actually ships work',
-  'Engineering groups standardizing local AI tooling',
-  'Consultancies adding repeatable agent capabilities for clients',
-];
 
 const intakeWorkflowSteps = [
   'Inbound call, form, or email',
@@ -704,33 +698,6 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="section comparison-section" id="not-a-chatbot">
-          <div className="comparison-card">
-            <div className="section-heading narrow">
-              <p className="eyebrow">Not Just A Chatbot</p>
-              <h2>Answers are useful. Action is better.</h2>
-            </div>
-            <div className="comparison-grid">
-              <div className="comparison-column muted-panel">
-                <h3>Traditional chatbot</h3>
-                <ul>
-                  <li>Waits for someone to click and ask a question</li>
-                  <li>Mostly answers from a fixed knowledge base</li>
-                  <li>Often leaves follow-up work to the owner</li>
-                </ul>
-              </div>
-              <div className="comparison-column accent-panel">
-                <h3>AI workforce</h3>
-                <ul>
-                  <li>Monitors the workflows that matter</li>
-                  <li>Updates tools, drafts responses, and completes routine tasks</li>
-                  <li>Escalates decisions with context instead of creating more noise</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="section split-section" id="process">
           <div className="section-heading">
             <p className="eyebrow">How It Works</p>
@@ -745,21 +712,6 @@ function HomePage() {
             ))}
           </ol>
         </section>
-
-        <section className="section split-panel" id="audience">
-          <div className="section-heading narrow">
-            <p className="eyebrow">Who It&apos;s For</p>
-            <h2>Best suited to teams that need working systems, not experiments.</h2>
-          </div>
-          <div className="audience-list">
-            {audiences.map((audience) => (
-              <div className="audience-item" key={audience}>
-                {audience}
-              </div>
-            ))}
-          </div>
-        </section>
-
 
         <section className="section intake-section" id="intake">
           <div className="section-heading wide">
