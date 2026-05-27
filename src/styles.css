@@ -1457,3 +1457,275 @@ h3 {
     padding: 1rem;
   }
 }
+
+/* Responsive optimization pass for the primary Stonebridge AI landing page. */
+.page-shell {
+  width: min(1200px, calc(100% - clamp(1rem, 4vw, 3rem)));
+}
+
+.topbar {
+  flex-wrap: wrap;
+}
+
+.nav {
+  row-gap: 0.55rem;
+}
+
+.nav a {
+  padding: 0.2rem 0;
+}
+
+.hero {
+  min-height: min(72vh, 46rem);
+  align-items: center;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h1 {
+  max-width: 12.5ch;
+  font-size: clamp(3rem, 7vw, 5.2rem);
+}
+
+.section {
+  padding: clamp(3rem, 6vw, 4.75rem) 0;
+}
+
+.contact-card {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.68fr);
+}
+
+.founder-card {
+  align-content: start;
+}
+
+.founder-card img {
+  max-height: 28rem;
+}
+
+@media (min-width: 981px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+  }
+
+  .hero-panel {
+    align-self: center;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .role-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .contact-copy {
+    min-height: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 980px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .nav {
+    justify-content: flex-start;
+  }
+
+  .hero {
+    gap: 1.25rem;
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .audit-card,
+  .cta-card {
+    padding: 1.75rem;
+  }
+
+  .card-grid,
+  .role-grid,
+  .comparison-grid,
+  .audit-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contact-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .founder-card {
+    grid-template-columns: minmax(180px, 0.38fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .founder-card img {
+    max-height: 18rem;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .page-shell {
+    width: min(100% - 1rem, 1200px);
+    padding-top: 0.85rem;
+    padding-bottom: 2.75rem;
+  }
+
+  .topbar {
+    gap: 0.9rem;
+  }
+
+  .brand {
+    font-size: 0.95rem;
+  }
+
+  .nav {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    font-size: 0.87rem;
+  }
+
+  .nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.55rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    text-align: center;
+  }
+
+  .section {
+    padding: 2.5rem 0;
+  }
+
+  .hero {
+    gap: 0.95rem;
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .audit-card,
+  .cta-card,
+  .comparison-card {
+    padding: 1.15rem;
+    border-radius: 1.15rem;
+  }
+
+  h1,
+  .landing-page .hero-copy h1 {
+    max-width: 11.5ch;
+    font-size: clamp(2.35rem, 13vw, 3.45rem);
+    line-height: 0.98;
+  }
+
+  h2,
+  .section-heading.wide h2,
+  .section-heading.narrow h2 {
+    max-width: 14ch;
+    font-size: clamp(1.75rem, 9vw, 2.4rem);
+  }
+
+  .lead,
+  .section-intro {
+    font-size: 0.98rem;
+  }
+
+  .hero-actions,
+  .contact-actions,
+  .form-actions {
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .button,
+  .audit-summary .button {
+    width: 100%;
+    min-height: 2.95rem;
+    padding: 0.78rem 1rem;
+    text-align: center;
+  }
+
+  .card-grid,
+  .role-grid,
+  .comparison-grid,
+  .audit-layout,
+  .contact-card,
+  .form-grid.two-column,
+  .form-grid.three-column,
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card,
+  .role-card,
+  .timeline-item,
+  .comparison-column,
+  .audit-list-panel,
+  .audience-item,
+  .intake-form,
+  .founder-card {
+    padding: 1rem;
+    border-radius: 1.05rem;
+  }
+
+  .timeline-item,
+  .step-item {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-item {
+    min-height: auto;
+    align-items: center;
+  }
+
+  .founder-card img {
+    max-height: 24rem;
+  }
+
+  .intake-form input,
+  .intake-form textarea,
+  .intake-form select {
+    min-height: 2.9rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .page-shell {
+    width: min(100% - 0.8rem, 1200px);
+  }
+
+  .nav {
+    grid-template-columns: 1fr;
+  }
+
+  h1,
+  .landing-page .hero-copy h1 {
+    font-size: clamp(2.15rem, 14vw, 2.85rem);
+  }
+
+  .hero-copy,
+  .hero-panel,
+  .audit-card,
+  .cta-card,
+  .comparison-card,
+  .intake-form {
+    padding: 0.95rem;
+  }
+}
