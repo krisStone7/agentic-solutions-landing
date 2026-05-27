@@ -535,7 +535,7 @@ function HomePage() {
       <main id="top">
         <section className="hero section">
           <div className="hero-copy">
-            <h1>Practical setup for private AI infrastructure.</h1>
+            <h1>Turnkey Business AI Infrastructure.</h1>
             <p className="lead">
               Stonebridge AI helps teams launch clean, usable environments for
               agent-assisted work. The focus is straightforward: reliable setup,
