@@ -12,7 +12,7 @@ const workflowAuditDeliverables = [
 const workflowAuditBestFor = [
   'Owners who know AI matters but need a concrete starting workflow',
   'Teams stuck in email, spreadsheets, CRMs, ticket queues, scheduling, or manual reporting',
-  'Operations-heavy teams that need useful automation, not novelty demos',
+  'Operations-heavy businesses that need useful automation, not novelty demos',
 ];
 
 const workflowAuditSignals = [
@@ -89,7 +89,7 @@ const agentRoles = [
   },
   {
     title: 'AI Operations Assistant',
-    summary: 'Keeps routine work moving without forcing everything through the owner.',
+    summary: 'Keeps routine business work moving without forcing everything through the owner.',
     tasks: ['Tracks follow-ups', 'Updates CRMs and spreadsheets', 'Summarizes daily activity', 'Flags overdue work'],
   },
   {
@@ -99,7 +99,7 @@ const agentRoles = [
   },
   {
     title: 'AI Marketing Assistant',
-    summary: 'Helps turn operating activity into useful content customers actually see.',
+    summary: 'Helps turn business activity into useful content customers actually see.',
     tasks: ['Drafts emails and posts', 'Repurposes ideas', 'Plans campaigns', 'Tracks engagement signals'],
   },
 ];
@@ -146,7 +146,7 @@ const services = [
   {
     title: 'Growth Visibility And Web Operations',
     description:
-      'Maintain website content, track operating activity, and turn analytics into clear insight on where the company is growing and where attention is needed.',
+      'Maintain website content, track business activity, and turn analytics into clear insight on where the company is growing and where attention is needed.',
   },
 ];
 
@@ -416,7 +416,7 @@ function AiReceptionistPage() {
         <section className="section fit-section" id="fit">
           <div className="section-heading wide">
             <p className="eyebrow">Best Fit</p>
-            <h2>Built for service teams with real intake volume.</h2>
+            <h2>Built for service businesses with real intake volume.</h2>
           </div>
           <div className="comparison-grid">
             <article className="comparison-column accent-panel">
@@ -441,7 +441,7 @@ function AiReceptionistPage() {
         <section className="section cta-section" id="final-cta">
           <div className="cta-card landing-cta">
             <p className="eyebrow">Next Step</p>
-            <h2>Want to find the highest-friction lead handoff in your workflow?</h2>
+            <h2>Want to find the highest-friction lead handoff in your business?</h2>
             <p>
               Book a 30-minute intake review. We will map one lead path, identify the manual handoffs, and show where
               approval-gated AI can safely reduce response time.
@@ -529,7 +529,7 @@ function HomePage() {
       <main id="top">
         <section className="hero section">
           <div className="hero-copy">
-            <h1>Turnkey Business AI Infrastructure.</h1>
+            <h1>Turnkey AI Infrastructure.</h1>
             <p className="lead">
               Stonebridge AI helps teams launch clean, usable environments for
               agent-assisted work. The focus is straightforward: reliable setup,
@@ -572,7 +572,7 @@ function HomePage() {
               <p className="eyebrow">First Offer</p>
               <h2>AI workflow audit for practical automation opportunities.</h2>
               <p className="section-intro">
-                Stop guessing where AI belongs in your operations. Stonebridge AI
+                Stop guessing where AI belongs in the business. Stonebridge AI
                 traces one or more real workflows end to end, identifies where
                 agents can safely reduce admin load, and turns the findings into
                 a prioritized roadmap grounded in your tools, data, and risk profile.
@@ -635,7 +635,7 @@ function HomePage() {
         <section className="section" id="services">
           <div className="section-heading">
             <p className="eyebrow">Services</p>
-            <h2>An AI Chief of Staff for growing service teams.</h2>
+            <h2>An AI Chief of Staff for growing service businesses.</h2>
           </div>
           <div className="card-grid">
             {services.map((service) => (
