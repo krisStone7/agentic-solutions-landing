@@ -679,7 +679,7 @@ function HomePage() {
         <section className="section day-section" id="day-in-the-life">
           <div className="section-heading wide">
             <p className="eyebrow">A Day With Your AI Workforce</p>
-            <h2>Your business keeps moving while you run the business.</h2>
+            <h2>Your operation keeps moving while you run it.</h2>
             <p className="section-intro">
               The goal is not novelty. The goal is fewer missed leads, fewer stale
               follow-ups, less admin drag, and a clearer view of what needs your attention.
