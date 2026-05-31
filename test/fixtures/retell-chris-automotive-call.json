@@ -1,0 +1,34 @@
+{
+  "event": "call_analyzed",
+  "call": {
+    "call_id": "call_2427dc723389a4f243bce625b30",
+    "call_status": "ended",
+    "from_number": "+15402927083",
+    "call_analysis": {
+      "in_voicemail": false,
+      "call_summary": "The caller, owner of Chris Automotive, discussed automating billing, scheduling, quoting, and parts lookup for their auto repair business. They currently use Excel, some QuickBooks, RockAuto, and in-person payments, and are interested in AI solutions to reduce manual work. The agent collected contact details and preferences for follow-up and budget.",
+      "user_sentiment": "Positive",
+      "custom_analysis_data": {
+        "summary": "Chris Automotive is seeking to automate billing, scheduling, quoting, and parts lookup to reduce manual work and improve efficiency. The owner currently uses Excel, QuickBooks, and RockAuto, with most customer interactions by phone and in-person payments. The main pain points are the time spent on parts lookup, quoting, and invoicing. The owner is exploring options, prefers phone follow-up, and has an initial budget of up to $1,000 a month.",
+        "recommended_next_step": "Call back the owner at 540-292-7083 to discuss solution options, clarify requirements, and review feasibility within the stated budget.",
+        "budget_signal": "Wants to start with an introductory solution, capping budget at about $1,000 a month.",
+        "preferred_follow_up": "phone",
+        "priority_signals": "Repetitive manual work, measurable pain in quoting and invoicing, willingness to discuss implementation and budget.",
+        "follow_up_priority": "high",
+        "problem": "Manual and time-consuming processes for billing, scheduling, quoting, and parts lookup in an auto repair business.",
+        "phone": "540-292-7083",
+        "timeline": "exploring options",
+        "company": "Chris Automotive",
+        "current_process": "Uses Excel spreadsheets for data entry, some QuickBooks, RockAuto for parts lookup, and handles payments in person with card readers and Stripe/Square.",
+        "current_tools": "Excel, QuickBooks, RockAuto, Stripe, Square, credit card readers, basic website",
+        "desired_outcome": "Automated flow where calls turn into draft quotes, parts and prices are suggested, and invoices are generated with less manual entry.",
+        "clarity_level": "clear",
+        "pain_points": "Manual effort required to find parts, build quotes, and create invoices; slow and repetitive processes.",
+        "email": "jacks@vardaspace.com",
+        "decision_role": "owner",
+        "sensitive_data_flag": false
+      },
+      "call_successful": true
+    }
+  }
+}

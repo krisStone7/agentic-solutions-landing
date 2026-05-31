@@ -23,6 +23,59 @@ function pick(...values) {
   return '';
 }
 
+
+function compactText(...values) {
+  return values.filter(Boolean).map((value) => String(value)).join(' ').trim();
+}
+
+function firstNonUnknown(...values) {
+  for (const value of values) {
+    const text = String(value ?? '').trim();
+    if (text && !/^(unknown|unknown caller|unknown company|not provided|n\/?a|null|none)$/i.test(text)) return text;
+  }
+  return '';
+}
+
+function inferIntent(custom = {}, analysis = {}, payload = {}) {
+  const explicit = firstNonUnknown(custom.intent, custom.call_intent, analysis.intent, payload.intent);
+  if (explicit) return explicit;
+
+  const evidence = compactText(
+    custom.problem,
+    custom.summary,
+    custom.call_summary,
+    custom.recommended_next_step,
+    custom.recommended_next_action,
+    custom.priority_signals,
+    analysis.call_summary,
+    analysis.summary,
+    payload.summary,
+  ).toLowerCase();
+
+  if (/\b(spam|wrong number|robocall|telemarketer)\b/.test(evidence)) return 'spam_or_wrong_number';
+  if (/\b(vendor|partnership|sell you|agency|directory listing)\b/.test(evidence)) return 'partnership_or_vendor';
+  if (/\b(existing client|current client|support|issue|problem with|broken|outage)\b/.test(evidence)) return 'support_or_issue';
+  if (/\b(lead|consult|consultation|quote|proposal|demo|pilot|automate|automation|workflow|integration|ai|agent|assistant|receptionist|billing|scheduling|invoic|parts lookup)\b/.test(evidence)) return 'new_lead';
+  return 'unknown';
+}
+
+function normalizeCaller(custom = {}, call = {}, payload = {}) {
+  const callerName = firstNonUnknown(
+    custom.caller,
+    custom.caller_name,
+    custom.caller_full_name,
+    custom.name,
+    custom.full_name,
+    call.caller_name,
+    payload.caller,
+  );
+  if (callerName) return callerName;
+
+  const company = firstNonUnknown(custom.company, custom.company_name, payload.company);
+  const phone = firstNonUnknown(custom.phone, custom.phone_number, call.from_number, call.fromNumber, payload.phone);
+  return firstNonUnknown(company, phone, 'Unknown caller');
+}
+
 function boolText(value) {
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';
   const text = clean(value, 'No');
@@ -133,14 +186,14 @@ function normalizeRetellPayload(payload) {
   const custom = customPayload(analysis, call);
   const transcript = pick(payload.transcript, call.transcript, analysis.transcript, call.transcript_object?.map?.((turn) => `${turn.role || turn.speaker || 'Speaker'}: ${turn.content || turn.text || ''}`).join('\n'));
   const summary = pick(custom.summary, custom.call_summary, analysis.call_summary, analysis.summary, payload.summary);
-  const caller = pick(custom.caller, custom.caller_name, custom.name, call.caller_name, payload.caller, 'Unknown caller');
+  const caller = normalizeCaller(custom, call, payload);
   const company = pick(custom.company, custom.company_name, payload.company, 'Unknown company');
   const phone = pick(custom.phone, custom.phone_number, call.from_number, call.fromNumber, payload.phone);
   const email = pick(custom.email, custom.email_address, payload.email);
   const contact = [phone, email].filter(Boolean).join(' / ') || 'Not provided';
-  const intent = clean(pick(custom.intent, custom.call_intent, analysis.intent, payload.intent), 'unknown');
-  const urgency = normalizeUrgency(pick(custom.urgency, custom.priority, analysis.urgency, payload.urgency));
-  const nextAction = clean(pick(custom.recommended_next_action, custom.next_action, analysis.recommended_next_action, payload.recommended_next_action), 'Review call and decide next step');
+  const intent = inferIntent(custom, analysis, payload);
+  const urgency = normalizeUrgency(pick(custom.urgency, custom.priority, custom.follow_up_priority, custom.priority_signals, analysis.urgency, payload.urgency));
+  const nextAction = clean(pick(custom.recommended_next_action, custom.recommended_next_step, custom.next_action, analysis.recommended_next_action, payload.recommended_next_action), 'Review call and decide next step');
   const escalationRequired = boolText(pick(custom.escalation_required, custom.escalation, analysis.escalation_required, payload.escalation_required, urgency === 'high'));
   const confidence = clean(pick(custom.confidence, analysis.confidence, analysis.call_successful === true ? '0.8' : ''), 'not provided');
 

@@ -147,3 +147,16 @@ test('creates local internal follow-up task records for voice-agent leads', () =
   assert.equal(appendVoiceCallTask(task, taskFile).created, false);
   assert.equal(readQueue(taskFile).length, 1);
 });
+
+test('infers caller and intent from Retell custom analysis when explicit fields are missing', () => {
+  const chrisAutomotivePayload = JSON.parse(readFileSync('test/fixtures/retell-chris-automotive-call.json', 'utf8'));
+  const summary = normalizeRetellPayload(chrisAutomotivePayload);
+
+  assert.equal(summary.caller, 'Chris Automotive');
+  assert.equal(summary.company, 'Chris Automotive');
+  assert.equal(summary.contact, '540-292-7083 / jacks@vardaspace.com');
+  assert.equal(summary.intent, 'new_lead');
+  assert.equal(summary.urgency, 'high');
+  assert.match(summary.summary, /automate billing, scheduling, quoting, and parts lookup/i);
+  assert.match(summary.recommendedNextAction, /Call back the owner/i);
+});
