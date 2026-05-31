@@ -1027,7 +1027,10 @@ function HomePage() {
               <p className="contact-note">Contact Kris Stone at Stonebridge AI.</p>
               <p className="contact-location">Los Angeles, CA</p>
               <div className="contact-actions">
-                <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
+                <a className="button button-primary" href="tel:+18883688306">
+                  Call the AI receptionist: (888) 368-8306
+                </a>
+                <a className="button button-secondary" href="mailto:stonebridgeai@agentmail.to">
                   stonebridgeai@agentmail.to
                 </a>
                 <a
