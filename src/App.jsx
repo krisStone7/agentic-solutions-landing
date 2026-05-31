@@ -1028,7 +1028,7 @@ function HomePage() {
               <p className="contact-location">Los Angeles, CA</p>
               <div className="contact-actions">
                 <a className="button button-primary" href="tel:+18883688306">
-                  Call Stonebridge AI today and let&apos;s see how we can help! (888) 368-8306
+                  Call Stonebridge AI today at (888) 368-8306
                 </a>
                 <a className="button button-primary" href="mailto:stonebridgeai@agentmail.to">
                   stonebridgeai@agentmail.to
