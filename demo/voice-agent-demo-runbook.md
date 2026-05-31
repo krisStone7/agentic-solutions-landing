@@ -139,7 +139,7 @@ Expected talking points:
 Live Retell test call checklist:
 
 1. Add `DISCORD_WEBHOOK_URL` as a secret environment variable for the deployed Pages project.
-2. Configure the Retell agent webhook URL to `https://stonebridgebai.com/api/retell-webhook`.
+2. Configure the Retell agent webhook URL to `https://stonebridgeai.co/api/retell-webhook`.
 3. Place one test call and wait for Retell's completed/analyzed event.
 4. Verify the Discord post contains caller, company, contact, intent, urgency, summary, recommended next action, escalation flag, confidence, call ID, and transcript.
 5. If it is a real lead/high-urgency call, run the local queue helper against the captured payload or create the internal follow-up task manually. Do not contact the lead without approval.

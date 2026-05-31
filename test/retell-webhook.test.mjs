@@ -1,9 +1,28 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { formatDiscordMessage, followUpDecision, handleRetellWebhook, normalizeRetellPayload } from '../functions/api/retell-webhook.js';
+import { createHmac } from 'node:crypto';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { formatDiscordMessage, followUpDecision, handleRetellWebhook, normalizeRetellPayload, parseRetellSignature, verifyRetellSignature } from '../functions/api/retell-webhook.js';
 
 const payload = JSON.parse(readFileSync('test/fixtures/retell-completed-call.json', 'utf8'));
+const retellApiKey = 'retell_test_webhook_key';
+const signedNow = 1780000000000;
+
+function retellSignature(rawBody, apiKey = retellApiKey, timestamp = signedNow) {
+  const digest = createHmac('sha256', apiKey).update(`${rawBody}${timestamp}`).digest('hex');
+  return `v=${timestamp},d=${digest}`;
+}
+
+function signedRetellRequest(body, { apiKey = retellApiKey, timestamp = signedNow } = {}) {
+  const rawBody = typeof body === 'string' ? body : JSON.stringify(body);
+  return new Request('https://stonebridgeai.co/api/retell-webhook', {
+    method: 'POST',
+    headers: { 'X-Retell-Signature': retellSignature(rawBody, apiKey, timestamp) },
+    body: rawBody,
+  });
+}
 
 test('normalizes completed Retell call into required Discord summary fields', () => {
   const summary = normalizeRetellPayload(payload);
@@ -36,15 +55,67 @@ test('applies simple follow-up queue rule for lead calls and QA calls', () => {
   assert.equal(qaDecision.action, 'archive_qa');
 });
 
+
+test('verifies Retell webhook signatures using raw body plus timestamp', async () => {
+  const rawBody = JSON.stringify(payload);
+  const signature = retellSignature(rawBody);
+
+  assert.deepEqual(parseRetellSignature(signature), {
+    timestamp: String(signedNow),
+    digest: signature.split('d=')[1],
+  });
+  assert.equal(await verifyRetellSignature({ rawBody, signature, apiKey: retellApiKey, now: signedNow }), true);
+  assert.equal(await verifyRetellSignature({ rawBody, signature, apiKey: 'wrong-key', now: signedNow }), false);
+});
+
+test('rejects Retell webhooks with missing, expired, or invalid signatures', async () => {
+  const rawBody = JSON.stringify(payload);
+  const env = { DISCORD_WEBHOOK_URL: 'https://discord.example/webhook', RETELL_API_KEY: retellApiKey };
+
+  const missing = await handleRetellWebhook({
+    request: new Request('https://stonebridgeai.co/api/retell-webhook', { method: 'POST', body: rawBody }),
+    env,
+    now: signedNow,
+  });
+  assert.equal(missing.status, 401);
+
+  const expired = await handleRetellWebhook({
+    request: signedRetellRequest(rawBody, { timestamp: signedNow - (6 * 60 * 1000) }),
+    env,
+    now: signedNow,
+  });
+  assert.equal(expired.status, 401);
+
+  const badDigest = await handleRetellWebhook({
+    request: new Request('https://stonebridgeai.co/api/retell-webhook', {
+      method: 'POST',
+      headers: { 'X-Retell-Signature': `v=${signedNow},d=${'0'.repeat(64)}` },
+      body: rawBody,
+    }),
+    env,
+    now: signedNow,
+  });
+  assert.equal(badDigest.status, 401);
+});
+
+test('requires a configured Retell webhook API key before processing POSTs', async () => {
+  const response = await handleRetellWebhook({
+    request: signedRetellRequest(payload),
+    env: { DISCORD_WEBHOOK_URL: 'https://discord.example/webhook' },
+    now: signedNow,
+  });
+  const body = await response.json();
+  assert.equal(response.status, 503);
+  assert.match(body.error, /signature verification is not configured/);
+});
+
 test('posts completed call to Discord webhook and returns follow-up decision', async () => {
   let posted = null;
-  const request = new Request('https://stonebridgebai.com/api/retell-webhook', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  const request = signedRetellRequest(payload);
   const response = await handleRetellWebhook({
     request,
-    env: { DISCORD_WEBHOOK_URL: 'https://discord.example/webhook' },
+    env: { DISCORD_WEBHOOK_URL: 'https://discord.example/webhook', RETELL_API_KEY: retellApiKey },
+    now: signedNow,
     fetchImpl: async (url, init) => {
       posted = { url, body: JSON.parse(init.body) };
       return new Response(null, { status: 204 });
@@ -59,9 +130,6 @@ test('posts completed call to Discord webhook and returns follow-up decision', a
   assert.equal(posted.url, 'https://discord.example/webhook');
   assert.match(posted.body.content, /Follow-up queue rule: queue_follow_up/);
 });
-import { mkdtempSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { buildVoiceCallTask, appendVoiceCallTask, readQueue } from '../scripts/retell-call-followup.mjs';
 
 test('creates local internal follow-up task records for voice-agent leads', () => {

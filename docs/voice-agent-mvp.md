@@ -49,8 +49,8 @@ Each lead summary should include:
 
 ### Current pieces already working
 
-- Cloudflare Pages site: `https://stonebridgebai.com`
-- Intake endpoint: `https://stonebridgebai.com/api/intake`
+- Cloudflare Pages site: `https://stonebridgeai.co`
+- Intake endpoint: `https://stonebridgeai.co/api/intake`
 - AgentMail inbox: `stonebridgeai@agentmail.to`
 - AgentMail delivery verified end-to-end with marker `E2E-20260523T080527Z`
 

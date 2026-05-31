@@ -3,7 +3,7 @@ New AI Integration Readiness Intake
 Name: Volt E2E Test
 Email: volt-e2e-test@example.com
 Company: Stonebridge AI Test E2E-20260523T080527Z
-Website: https://stonebridgebai.com
+Website: https://stonebridgeai.co
 
 What the company does:
 End-to-end verification test for the live Stonebridge AI intake form.

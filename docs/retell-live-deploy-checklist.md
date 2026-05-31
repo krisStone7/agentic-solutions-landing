@@ -9,6 +9,7 @@ Purpose: move the local Retell -> Discord MVP from tested code to a live Stonebr
 - Unit/integration tests pass locally with a mocked Discord webhook
 - Production build passes locally
 - No live Discord webhook secret has been configured by Volt
+- Retell webhook signature verification is implemented locally and must be deployed with `RETELL_WEBHOOK_API_KEY` before live testing
 - No Retell webhook configuration has been changed by Volt
 - No real call has been placed by Volt
 
@@ -17,30 +18,35 @@ Purpose: move the local Retell -> Discord MVP from tested code to a live Stonebr
 Cloudflare Pages project serving:
 
 ```text
-https://stonebridgebai.com
+https://stonebridgeai.co
 ```
 
 Expected live endpoint after deploy:
 
 ```text
-POST https://stonebridgebai.com/api/retell-webhook
+POST https://stonebridgeai.co/api/retell-webhook
 ```
 
 Cloudflare Pages Functions should route `functions/api/retell-webhook.js` to that endpoint.
 
-## Required secret
+## Required secrets
 
-Set this in Cloudflare Pages project settings, not in git:
+Set these in Cloudflare Pages project settings, not in git:
 
 ```text
+RETELL_WEBHOOK_API_KEY=<Retell API key with webhook badge>
 DISCORD_WEBHOOK_URL=<Discord webhook URL for #inbound-calls>
 ```
+
+`RETELL_API_KEY` is also accepted for Retell verification. `RETELL_WEBHOOK_API_KEY` is preferred because it makes the secret purpose explicit.
 
 Security requirements:
 
 - Keep the webhook URL and bot token out of repository files, Discord chat, logs, screenshots, and test fixtures.
 - Rotate any secret immediately if exposed.
 - The webhook code sends `allowed_mentions: { parse: [] }` to avoid accidental pings.
+- The webhook rejects unsigned, expired, or invalid `X-Retell-Signature` requests with HTTP 401.
+- Retell signatures are checked as `HMAC-SHA256(raw_body + timestamp, Retell webhook API key)` with a 5 minute replay window.
 
 ## Pre-deploy validation
 
@@ -84,7 +90,7 @@ Volt should not choose this path without Kris approval because it changes live i
 In Retell, set the agent webhook URL to:
 
 ```text
-https://stonebridgebai.com/api/retell-webhook
+https://stonebridgeai.co/api/retell-webhook
 ```
 
 Subscribe/send completed or analyzed call events. The webhook accepts events/statuses matching completed, ended, analyzed, or post-call patterns.
@@ -127,6 +133,7 @@ Go live only if:
 
 - Tests pass
 - Build passes
+- Retell signature verification is configured with `RETELL_WEBHOOK_API_KEY` or `RETELL_API_KEY`
 - Discord delivery is configured as either `DISCORD_WEBHOOK_URL`, or `DISCORD_BOT_TOKEN` plus `DISCORD_CHANNEL_ID`
 - Retell points to the correct endpoint
 - One real test call posts correctly to Discord

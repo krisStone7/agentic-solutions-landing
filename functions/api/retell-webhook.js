@@ -1,6 +1,8 @@
 const MAX_BODY_LENGTH = 100000;
 const MAX_DISCORD_CONTENT_LENGTH = 1900;
 const DEFAULT_TASK_FILE = 'tasks/lead-followups.jsonl';
+const RETELL_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;
+
 
 function jsonResponse(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
@@ -32,6 +34,79 @@ function normalizeUrgency(value) {
   if (/urgent|high|asap|immediate|emergency|today/.test(text)) return 'high';
   if (/low|later|not urgent/.test(text)) return 'low';
   return 'normal';
+}
+
+
+function retellWebhookApiKey(env = {}) {
+  return env.RETELL_WEBHOOK_API_KEY || env.RETELL_API_KEY || env.RETELL_WEBHOOK_SECRET || '';
+}
+
+function parseRetellSignature(signature) {
+  const match = String(signature || '').trim().match(/^v=(\d+),d=([a-fA-F0-9]+)$/);
+  if (!match) return null;
+  return { timestamp: match[1], digest: match[2].toLowerCase() };
+}
+
+function hexToBytes(hex) {
+  if (!hex || hex.length % 2 !== 0 || !/^[a-fA-F0-9]+$/.test(hex)) return null;
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let index = 0; index < hex.length; index += 2) {
+    bytes[index / 2] = Number.parseInt(hex.slice(index, index + 2), 16);
+  }
+  return bytes;
+}
+
+function constantTimeEqual(left, right) {
+  if (!(left instanceof Uint8Array) || !(right instanceof Uint8Array)) return false;
+  if (left.length !== right.length) return false;
+  let difference = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    difference |= left[index] ^ right[index];
+  }
+  return difference === 0;
+}
+
+async function hmacSha256Hex(message, secret, cryptoImpl = globalThis.crypto) {
+  if (!cryptoImpl?.subtle) throw new Error('Web Crypto API is unavailable for Retell signature verification.');
+  const encoder = new TextEncoder();
+  const key = await cryptoImpl.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const signature = await cryptoImpl.subtle.sign('HMAC', key, encoder.encode(message));
+  return Array.from(new Uint8Array(signature)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyRetellSignature({ rawBody, signature, apiKey, now = Date.now(), cryptoImpl = globalThis.crypto }) {
+  const parsed = parseRetellSignature(signature);
+  if (!apiKey || !parsed) return false;
+
+  const timestampMs = Number.parseInt(parsed.timestamp, 10);
+  if (!Number.isSafeInteger(timestampMs)) return false;
+  if (Math.abs(now - timestampMs) > RETELL_SIGNATURE_MAX_AGE_MS) return false;
+
+  const expectedHex = await hmacSha256Hex(`${rawBody}${parsed.timestamp}`, apiKey, cryptoImpl);
+  const expected = hexToBytes(expectedHex);
+  const provided = hexToBytes(parsed.digest);
+  return constantTimeEqual(expected, provided);
+}
+
+async function requireRetellSignature({ rawBody, request, env, now, cryptoImpl }) {
+  const apiKey = retellWebhookApiKey(env);
+  if (!apiKey) {
+    return { ok: false, response: jsonResponse({ error: 'Retell webhook signature verification is not configured. Set RETELL_WEBHOOK_API_KEY or RETELL_API_KEY.' }, 503) };
+  }
+
+  const signature = request.headers.get('X-Retell-Signature');
+  const valid = await verifyRetellSignature({ rawBody, signature, apiKey, now, cryptoImpl });
+  if (!valid) {
+    return { ok: false, response: jsonResponse({ error: 'Unauthorized Retell webhook signature.' }, 401) };
+  }
+
+  return { ok: true };
 }
 
 function completedEvent(payload) {
@@ -166,10 +241,13 @@ async function postToDiscord(env, content, fetchImpl = fetch) {
   throw new Error('Discord destination is not configured. Set DISCORD_WEBHOOK_URL, or DISCORD_BOT_TOKEN plus DISCORD_CHANNEL_ID.');
 }
 
-async function handleRetellWebhook({ request, env, fetchImpl = fetch }) {
+async function handleRetellWebhook({ request, env, fetchImpl = fetch, now = Date.now(), cryptoImpl = globalThis.crypto }) {
   if (request.method !== 'POST') return jsonResponse({ error: 'Method not allowed.' }, 405);
   const rawBody = await request.text();
   if (rawBody.length > MAX_BODY_LENGTH) return jsonResponse({ error: 'Webhook body is too large.' }, 413);
+
+  const signatureCheck = await requireRetellSignature({ rawBody, request, env, now, cryptoImpl });
+  if (!signatureCheck.ok) return signatureCheck.response;
 
   let payload;
   try {
@@ -207,5 +285,7 @@ export {
   normalizeRetellPayload,
   formatDiscordMessage,
   followUpDecision,
+  parseRetellSignature,
+  verifyRetellSignature,
   handleRetellWebhook,
 };

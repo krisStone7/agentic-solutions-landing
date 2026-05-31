@@ -21,6 +21,60 @@ const workflowAuditSignals = [
   'The team has repeatable decisions that still require judgment and escalation',
 ];
 
+const auditDiscoverySteps = [
+  {
+    title: 'Map one real workflow',
+    detail:
+      'We start with a recent lead, request, quote, ticket, or follow-up and trace it from trigger to completion.',
+  },
+  {
+    title: 'Find the failure points',
+    detail:
+      'We identify where work stalls, context is copied by hand, ownership is unclear, or reminders depend on memory.',
+  },
+  {
+    title: 'Select AI-safe candidates',
+    detail:
+      'We prioritize work AI can summarize, classify, draft, route, or queue before a human approves the customer-visible action.',
+  },
+  {
+    title: 'Define safety gates',
+    detail:
+      'We document what the system may read, what it may draft, and what it must never send, book, update, or promise without approval.',
+  },
+];
+
+const auditCandidateExamples = [
+  {
+    title: 'Lead intake triage',
+    detail: 'Summarize the request, extract contact details, classify urgency, draft a next reply, and queue the follow-up.',
+  },
+  {
+    title: 'Inbox to task queue',
+    detail: 'Classify customer messages, extract owner and due date, flag sensitive requests, and stage the next action.',
+  },
+  {
+    title: 'Quote follow-up assistant',
+    detail: 'Notice stale quotes, draft context-aware follow-ups, and remind the owner before the opportunity goes cold.',
+  },
+];
+
+const auditScoreFactors = [
+  'Clear business pain tied to revenue, time, response speed, or customer experience',
+  'Repeatable workflow with a known owner and visible trigger',
+  'Multiple systems involved, such as inbox, CRM, calendar, spreadsheet, forms, or phone',
+  'Useful draft-only, read-only, or approval-gated starting point',
+  'Manageable data sensitivity and a clear safe access path',
+  'Easy ROI story in dollars, hours, missed leads, or reduced delay',
+];
+
+const auditOutputs = [
+  'Workflow map with tools, people, handoffs, decision points, and failure modes',
+  'Top 3 AI candidates ranked by value, effort, risk, and data readiness',
+  'Recommended first build with integrations, approval gates, acceptance tests, and rollback plan',
+  'Security and operations notes covering data sensitivity, credential boundaries, logging, and limitations',
+];
+
 
 const toolOptions = [
   'Email',
@@ -628,6 +682,72 @@ function HomePage() {
                   ))}
                 </ul>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section discovery-section" id="workflow-audit-discovery">
+          <div className="section-heading wide">
+            <p className="eyebrow">Workflow Audit Discovery</p>
+            <h2>A focused way to find the first safe AI workflow.</h2>
+            <p className="section-intro">
+              The Workflow Audit starts with one real operating process, not a generic AI demo. In 30 minutes, we look
+              for the highest-friction handoff, score whether AI is a good fit, and define a controlled first slice that
+              keeps customer-visible actions behind human approval.
+            </p>
+          </div>
+
+          <div className="discovery-grid">
+            <article className="discovery-card discovery-overview">
+              <p className="panel-label">How discovery works</p>
+              <ol className="numbered-list">
+                {auditDiscoverySteps.map((step, index) => (
+                  <li key={step.title}>
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <div>
+                      <h3>{step.title}</h3>
+                      <p>{step.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </article>
+
+            <article className="discovery-card">
+              <p className="panel-label">Good fit signals</p>
+              <ul className="check-list">
+                {auditScoreFactors.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="discovery-card accent-panel">
+              <p className="panel-label">Example first slices</p>
+              <div className="mini-card-stack">
+                {auditCandidateExamples.map((candidate) => (
+                  <div className="mini-card" key={candidate.title}>
+                    <h3>{candidate.title}</h3>
+                    <p>{candidate.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+
+          <div className="audit-output-panel">
+            <div>
+              <p className="eyebrow">What the audit produces</p>
+              <h2>Clear next steps, not a vague AI wish list.</h2>
+            </div>
+            <ul className="check-list two-column-list">
+              {auditOutputs.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <div className="approval-note">
+              <strong>Safety boundary:</strong> the first build is scoped as read-only, draft-only, or approval-gated
+              unless you explicitly approve a broader operating mode.
             </div>
           </div>
         </section>
